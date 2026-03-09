@@ -1494,61 +1494,11 @@ async function saveAc(type) {
 })();
 
 // ─────────────────────────────────────────────
-// PHOTOS / REGISTROS
+// PHOTOS / REGISTROS — usa Supabase Storage
 // ─────────────────────────────────────────────
 const PHOTOS = {};
-function compressImage(dataUrl, maxW, quality) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      try {
-        const scale = Math.min(1, maxW / img.width);
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      } catch(e) { reject(e); }
-    };
-    img.onerror = reject;
-    img.src = dataUrl;
-  });
-}
-function addPhoto(input, galleryId) {
-  if (!PHOTOS[galleryId]) PHOTOS[galleryId] = [];
-  Array.from(input.files).forEach(file => {
-    const r = new FileReader();
-    r.onload = async e => {
-      try {
-        showSyncToast('📸 Salvando foto...', 'info');
-        const compressed = await compressImage(e.target.result, 600, 0.6);
-        const row = { album: galleryId, name: file.name, data: compressed };
-        const saved = await dbInsert('cork_fotos', row);
-        if (saved) {
-          PHOTOS[galleryId].push({ id: saved.id, ...row });
-          renderGallery(galleryId);
-          const card = document.getElementById('album-' + galleryId);
-          if (card && !card.classList.contains('open')) card.classList.add('open');
-          showSyncToast('📸 Foto salva!', 'ok');
-        } else {
-          // Salva localmente se Supabase falhar
-          const localId = 'local_' + Date.now();
-          PHOTOS[galleryId].push({ id: localId, album: galleryId, name: file.name, data: compressed });
-          renderGallery(galleryId);
-          const card = document.getElementById('album-' + galleryId);
-          if (card && !card.classList.contains('open')) card.classList.add('open');
-          showSyncToast('📸 Foto salva localmente', 'info');
-        }
-      } catch(err) {
-        console.error('addPhoto error:', err);
-        showSyncToast('⚠️ Erro: ' + err.message, 'error');
-      }
-    };
-    r.onerror = () => showSyncToast('⚠️ Erro ao ler arquivo', 'error');
-    r.readAsDataURL(file);
-  }); input.value = '';
-}
+const STORAGE_BUCKET = 'Cork Fotos';
+
 function toggleAlbum(id) {
   const card = document.getElementById('album-' + id);
   if (card) card.classList.toggle('open');
@@ -1559,14 +1509,51 @@ function updateAlbumCount(id) {
 }
 function renderGallery(id) {
   const g = document.getElementById(id); if (!g) return;
-  g.innerHTML = (PHOTOS[id] || []).map((p, i) => `<div class="regitem"><img src="${p.data||p}" onclick="openLB('${p.data||p}')"><button class="regdel" onclick="delPhoto('${id}','${p.id||i}',${i})">✕</button></div>`).join('') +
+  g.innerHTML = (PHOTOS[id] || []).map((p, i) => `<div class="regitem"><img src="${p.url}" onclick="openLB('${p.url}')"><button class="regdel" onclick="delPhoto('${id}','${p.path}',${i})">✕</button></div>`).join('') +
     `<div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'${id}')"><span class="plus">＋</span><p>Adicionar</p></div>`;
   updateAlbumCount(id);
 }
-async function delPhoto(id, rowId, i) {
-  if (!isNaN(rowId)) { PHOTOS[id].splice(i, 1); renderGallery(id); return; }
-  await dbDelete('cork_fotos', { id: rowId });
-  PHOTOS[id].splice(i, 1); renderGallery(id);
+
+function addPhoto(input, galleryId) {
+  if (!PHOTOS[galleryId]) PHOTOS[galleryId] = [];
+  Array.from(input.files).forEach(async file => {
+    try {
+      showSyncToast('📸 Salvando foto...', 'info');
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = galleryId + '/' + Date.now() + '_' + Math.random().toString(36).slice(2) + '.' + ext;
+      // Upload para Storage
+      const { data: upData, error: upErr } = await sb.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: false });
+      if (upErr) { showSyncToast('⚠️ Erro upload: ' + upErr.message, 'error'); return; }
+      // Pega URL pública
+      const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      const url = urlData.publicUrl;
+      // Salva referência na tabela
+      const saved = await dbInsert('cork_fotos', { album: galleryId, name: file.name, data: url });
+      const photoId = saved?.id || ('local_' + Date.now());
+      PHOTOS[galleryId].push({ id: photoId, path, url, album: galleryId, name: file.name });
+      renderGallery(galleryId);
+      const card = document.getElementById('album-' + galleryId);
+      if (card && !card.classList.contains('open')) card.classList.add('open');
+      showSyncToast('📸 Foto salva na nuvem!', 'ok');
+    } catch(err) {
+      showSyncToast('⚠️ Erro: ' + err.message, 'error');
+    }
+  });
+  input.value = '';
+}
+
+async function delPhoto(id, path, i) {
+  // Remove do Storage
+  if (path && !path.startsWith('local_')) {
+    await sb.storage.from(STORAGE_BUCKET).remove([path]);
+  }
+  // Remove da tabela (busca por URL)
+  const foto = (PHOTOS[id] || [])[i];
+  if (foto?.id && !foto.id.startsWith('local_')) {
+    await dbDelete('cork_fotos', { id: foto.id });
+  }
+  PHOTOS[id].splice(i, 1);
+  renderGallery(id);
 }
 
 (async function() {
@@ -1574,14 +1561,12 @@ async function delPhoto(id, rowId, i) {
   if (rows && rows.length) {
     rows.forEach(r => {
       if (!PHOTOS[r.album]) PHOTOS[r.album] = [];
-      PHOTOS[r.album].push({ id: r.id, data: r.data, name: r.name, album: r.album });
-    });
-    ['reg-main','reg-escola','reg-viagens','reg-amigos','ac-photos-inicial','ac-photos-fixa'].forEach(id => renderGallery(id));
-  } else {
-    ['reg-main','reg-escola','reg-viagens','reg-amigos','ac-photos-inicial','ac-photos-fixa'].forEach(id => {
-      try { const s = JSON.parse(localStorage.getItem('ph_' + id) || 'null'); if (s) { PHOTOS[id] = s.map((d,i) => ({ id: 'local_'+i, data: d })); renderGallery(id); } } catch(e) {}
+      // data agora é a URL pública
+      const path = r.data?.includes('Cork%20Fotos/') ? decodeURIComponent(r.data.split('Cork%20Fotos/')[1]) : r.album + '/' + r.name;
+      PHOTOS[r.album].push({ id: r.id, path, url: r.data, name: r.name, album: r.album });
     });
   }
+  ['reg-main','reg-escola','reg-viagens','reg-amigos','ac-photos-inicial','ac-photos-fixa'].forEach(id => renderGallery(id));
 })();
 
 // ─────────────────────────────────────────────
