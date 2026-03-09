@@ -359,7 +359,7 @@ table.t tr:nth-child(even) td{background:var(--gp);}
 /* ── MOBILE ── */
 @media(max-width:720px){
   .sidebar{display:none;}
-  .bnav{display:block;}
+  .hmb-btn{display:block;}
   .pg{padding:11px 13px 14px;}
   .hero-flag{grid-template-columns:1fr;}
   .hf-white{flex-direction:row;gap:12px;justify-content:center;padding:11px;}
@@ -385,20 +385,44 @@ table.t tr:nth-child(even) td{background:var(--gp);}
   <div class="hdr-title">Thales 🍀 Cork 2026<small>SEDA College · Irlanda</small></div>
   <button class="sync-btn" onclick="syncAll()" title="Atualizar cotação"><span id="sync-ico">🔄</span> Sync</button>
   <span class="hdr-flag">🇮🇪</span>
+  <button class="hmb-btn" onclick="openMenu()" title="Menu">☰</button>
 </div>
 
-<!-- TOP NAV (mobile) -->
-<div class="bnav">
-  <div class="bnitems">
-    <button class="bni on" onclick="goTo('home')"><span class="bi">🏠</span><span class="bl">Início</span></button>
-    <button class="bni" onclick="goTo('timeline')"><span class="bi">📅</span><span class="bl">Agenda</span></button>
-    <button class="bni" onclick="goTo('checklist')"><span class="bi">✅</span><span class="bl">Check</span></button>
-    <button class="bni" onclick="goTo('cork')"><span class="bi">📍</span><span class="bl">Cork</span></button>
-    <button class="bni" onclick="goTo('europa')"><span class="bi">🌍</span><span class="bl">Europa</span></button>
-    <button class="bni" onclick="goTo('dinheiro')"><span class="bi">💶</span><span class="bl">€</span></button>
-    <button class="bni" onclick="goTo('registros')"><span class="bi">📸</span><span class="bl">Fotos</span></button>
-    <button class="bni" onclick="goTo('tradutor')"><span class="bi">🗣️</span><span class="bl">Traduzir</span></button>
+<!-- HAMBURGER OVERLAY -->
+<div class="hmb-overlay" id="hmb-overlay" onclick="closeMenu()"></div>
+
+<!-- HAMBURGER DRAWER -->
+<div class="hmb-drawer" id="hmb-drawer">
+  <div class="hmb-header">
+    <span>🍀 Cork 2026</span>
+    <button class="hmb-close" onclick="closeMenu()">✕</button>
   </div>
+
+  <div class="hmb-section">Principal</div>
+  <button class="hmb-item on" id="hmb-home" onclick="goTo('home');closeMenu()"><span class="hi">🏠</span><span class="hl">Início</span></button>
+  <button class="hmb-item" id="hmb-voo" onclick="goTo('voo');closeMenu()"><span class="hi">✈️</span><span class="hl">Meu Voo</span></button>
+  <button class="hmb-item" id="hmb-acomodacao" onclick="goTo('acomodacao');closeMenu()"><span class="hi">🏠</span><span class="hl">Acomodação</span></button>
+  <button class="hmb-item" id="hmb-timeline" onclick="goTo('timeline');closeMenu()"><span class="hi">📅</span><span class="hl">Cronograma</span></button>
+  <button class="hmb-item" id="hmb-checklist" onclick="goTo('checklist');closeMenu()"><span class="hi">✅</span><span class="hl">Checklist</span></button>
+  <button class="hmb-item" id="hmb-docs" onclick="goTo('docs');closeMenu()"><span class="hi">📁</span><span class="hl">Documentos</span></button>
+  <button class="hmb-item" id="hmb-notas" onclick="goTo('notas');closeMenu()"><span class="hi">📝</span><span class="hl">Anotações</span></button>
+
+  <div class="hmb-section">Irlanda & Europa</div>
+  <button class="hmb-item" id="hmb-cork" onclick="goTo('cork');closeMenu()"><span class="hi">📍</span><span class="hl">Roteiro em Cork</span></button>
+  <button class="hmb-item" id="hmb-voos" onclick="goTo('voos');closeMenu()"><span class="hi">✈️</span><span class="hl">Viagens Europa</span></button>
+  <button class="hmb-item" id="hmb-guia-cork" onclick="goTo('guia-cork');closeMenu()"><span class="hi">📍</span><span class="hl">Guia de Cork</span></button>
+  <button class="hmb-item" id="hmb-europa" onclick="goTo('europa');closeMenu()"><span class="hi">🌍</span><span class="hl">Guia Europa</span></button>
+  <button class="hmb-item" id="hmb-tradutor" onclick="goTo('tradutor');closeMenu()"><span class="hi">🗣️</span><span class="hl">Tradutor</span></button>
+
+  <div class="hmb-section">Finanças & Memórias</div>
+  <button class="hmb-item" id="hmb-dinheiro" onclick="goTo('dinheiro');closeMenu()"><span class="hi">💶</span><span class="hl">Dinheiro</span></button>
+  <button class="hmb-item" id="hmb-registros" onclick="goTo('registros');closeMenu()"><span class="hi">📸</span><span class="hl">Registros</span></button>
+
+  <div class="hmb-section">Informações</div>
+  <button class="hmb-item" id="hmb-financeiro" onclick="goTo('financeiro');closeMenu()"><span class="hi">💰</span><span class="hl">Financeiro</span></button>
+  <button class="hmb-item" id="hmb-emprego" onclick="goTo('emprego');closeMenu()"><span class="hi">💼</span><span class="hl">Emprego</span></button>
+  <button class="hmb-item" id="hmb-guia" onclick="goTo('guia');closeMenu()"><span class="hi">📖</span><span class="hl">Guia Cork</span></button>
+  <button class="hmb-item" id="hmb-dicas" onclick="goTo('dicas');closeMenu()"><span class="hi">💡</span><span class="hl">Dicas</span></button>
 </div>
 
 <!-- LAYOUT -->
@@ -984,6 +1008,14 @@ window.addEventListener('offline', () => { isOnline = false; showSyncToast('📵
 // ─────────────────────────────────────────────
 // NAVIGATION
 // ─────────────────────────────────────────────
+function openMenu() {
+  document.getElementById('hmb-drawer').classList.add('open');
+  document.getElementById('hmb-overlay').classList.add('open');
+}
+function closeMenu() {
+  document.getElementById('hmb-drawer').classList.remove('open');
+  document.getElementById('hmb-overlay').classList.remove('open');
+}
 function goTo(page) {
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
   const el = document.getElementById('pg-' + page);
