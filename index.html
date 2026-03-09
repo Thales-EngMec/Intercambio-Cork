@@ -432,10 +432,10 @@ table.t tr:nth-child(even) td{background:var(--gp);}
   <button class="hmb-item" id="hmb-registros" onclick="goTo('registros');closeMenu()"><span class="hi">📸</span><span class="hl">Registros</span></button>
 
   <div class="hmb-section">Informações</div>
-  <button class="hmb-item" id="hmb-financeiro" onclick="goTo('financeiro');closeMenu()"><span class="hi">💰</span><span class="hl">Financeiro</span></button>
-  <button class="hmb-item" id="hmb-emprego" onclick="goTo('emprego');closeMenu()"><span class="hi">💼</span><span class="hl">Emprego</span></button>
-  <button class="hmb-item" id="hmb-guia" onclick="goTo('guia');closeMenu()"><span class="hi">📖</span><span class="hl">Guia Cork</span></button>
-  <button class="hmb-item" id="hmb-dicas" onclick="goTo('dicas');closeMenu()"><span class="hi">💡</span><span class="hl">Dicas</span></button>
+  <button class="hmb-item" id="hmb-financeiro" onclick="goTo('info');openTab('fin');closeMenu()"><span class="hi">💰</span><span class="hl">Financeiro</span></button>
+  <button class="hmb-item" id="hmb-emprego" onclick="goTo('info');openTab('emp');closeMenu()"><span class="hi">💼</span><span class="hl">Emprego</span></button>
+  <button class="hmb-item" id="hmb-guia" onclick="goTo('info');openTab('guia');closeMenu()"><span class="hi">📖</span><span class="hl">Guia Cork</span></button>
+  <button class="hmb-item" id="hmb-dicas" onclick="goTo('info');openTab('dicas');closeMenu()"><span class="hi">💡</span><span class="hl">Dicas</span></button>
 </div>
 
 <!-- LAYOUT -->
@@ -1030,6 +1030,7 @@ function closeMenu() {
   document.getElementById('hmb-overlay').classList.remove('open');
 }
 function goTo(page) {
+  try { localStorage.setItem('lastPage', page); } catch(e) {}
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
   const el = document.getElementById('pg-' + page);
   if (el) el.classList.add('on');
@@ -1210,8 +1211,10 @@ function calcMoney() {
   window._moneyTimer = setTimeout(async () => {
     const ve = document.getElementById('m-euro')?.value, vr = document.getElementById('m-real')?.value;
     try { localStorage.setItem('m_e', ve); localStorage.setItem('m_r', vr); } catch(e) {}
-    await dbUpsert('cork_dinheiro', { id: 'm_e', value: ve, updated_at: new Date().toISOString() });
-    await dbUpsert('cork_dinheiro', { id: 'm_r', value: vr, updated_at: new Date().toISOString() });
+    const ok1 = await dbUpsert('cork_dinheiro', { id: 'm_e', value: ve, updated_at: new Date().toISOString() });
+    const ok2 = await dbUpsert('cork_dinheiro', { id: 'm_r', value: vr, updated_at: new Date().toISOString() });
+    if (ok1 && ok2) showSyncToast('💶 Valores salvos na nuvem!', 'ok');
+    else showSyncToast('⚠️ Erro ao salvar — verifique conexão', 'error');
   }, 1000);
 }
 (async function() {
@@ -2201,18 +2204,42 @@ function speak(text, lang) {
   window.speechSynthesis.speak(u);
 }
 function speakTrans() { const out = document.getElementById('trans-out')?.textContent; const lang = document.getElementById('lang-sel')?.value || 'en'; if (out && out !== 'A tradução aparecerá aqui') speak(out, lang); }
-function doTranslate() {
+async function doTranslate() {
   const lang = document.getElementById('lang-sel')?.value || 'en';
   const text = document.getElementById('trans-in')?.value || '';
   const out = document.getElementById('trans-out'); if (!out) return;
   if (!text) { out.textContent = 'Digite algo para traduzir'; return; }
+
+  // Primeiro tenta frases prontas
   let found = '';
   const cats = PHRASES[lang] || PHRASES.en;
   Object.values(cats).forEach(phrases => phrases.forEach(p => { const [pt, tr] = p.split('→'); if (text.toLowerCase().includes(pt.toLowerCase().slice(0, 10))) found = tr; }));
-  out.textContent = found || '(Use Google Translate para traduções personalizadas — translate.google.com)';
+  if (found) { out.textContent = found; return; }
+
+  // Se não achou nas frases prontas, usa MyMemory API (gratuita, sem chave)
+  out.textContent = '⏳ Traduzindo...';
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=pt|${lang}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.responseStatus === 200 && data.responseData?.translatedText) {
+      out.textContent = data.responseData.translatedText;
+    } else {
+      out.textContent = '⚠️ Não foi possível traduzir. Tente novamente.';
+    }
+  } catch(e) {
+    out.textContent = '⚠️ Sem conexão. Verifique a internet.';
+  }
 }
 
 console.log('🍀 Thales — Intercâmbio Cork 2026 pronto!');
+// Restaurar última página visitada
+try {
+  const lastPage = localStorage.getItem('lastPage');
+  if (lastPage && document.getElementById('pg-' + lastPage)) {
+    goTo(lastPage);
+  }
+} catch(e) {}
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
