@@ -62,7 +62,20 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .pg.on{display:block;}
 
 /* ── TOP NAV ── */
-.bnav{display:none;background:var(--g);flex-shrink:0;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.09);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.bnav{display:none;}
+.hmb-btn{display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:5px 9px;font-size:1.2rem;cursor:pointer;line-height:1;flex-shrink:0;}
+.hmb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;}
+.hmb-overlay.open{display:block;}
+.hmb-drawer{position:fixed;top:0;left:-290px;width:270px;height:100%;background:var(--g);z-index:501;transition:left .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding-bottom:40px;}
+.hmb-drawer.open{left:0;}
+.hmb-header{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:space-between;}
+.hmb-header span{font-family:'Playfair Display',serif;color:#fff;font-size:.95rem;font-weight:700;}
+.hmb-close{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.8);font-size:1rem;cursor:pointer;padding:4px 8px;border-radius:6px;}
+.hmb-section{padding:12px 0 4px 14px;font-size:.58rem;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:1.2px;font-weight:600;}
+.hmb-item{display:flex;align-items:center;gap:10px;padding:9px 14px;color:rgba(255,255,255,.72);cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;font-size:.84rem;transition:background .12s;}
+.hmb-item.on{background:rgba(255,255,255,.1);color:var(--goldl);font-weight:500;}
+.hmb-item .hi{font-size:1rem;width:20px;text-align:center;flex-shrink:0;}
+.hmb-item .hl{flex:1;}
 .bnitems{display:flex;justify-content:space-around;}
 .bni{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 5px;cursor:pointer;color:rgba(255,255,255,.48);border:none;background:none;font-family:'DM Sans',sans-serif;min-width:42px;}
 .bni.on{color:var(--goldl);}
