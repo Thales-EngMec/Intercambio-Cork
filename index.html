@@ -334,6 +334,25 @@ table.t tr:nth-child(even) td{background:var(--gp);}
 .regadd p{font-size:.58rem;color:var(--g);margin-top:2px;font-weight:500;}
 /* Album cards */
 .album-card{background:var(--w);border-radius:12px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:10px;overflow:hidden;}
+/* Acomodações fixas */
+.ac-card{background:var(--w);border-radius:14px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:12px;overflow:hidden;}
+.ac-card-header{padding:14px;display:flex;gap:12px;align-items:flex-start;}
+.ac-card-icon{font-size:1.6rem;line-height:1;}
+.ac-card-info{flex:1;}
+.ac-card-nome{font-weight:700;font-size:.95rem;color:var(--dark);}
+.ac-card-end{font-size:.75rem;color:var(--gray);margin-top:2px;}
+.ac-card-badge{display:inline-block;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px;}
+.ac-card-badge.atual{background:#d4f5e2;color:#1a5c2e;}
+.ac-card-badge.passada{background:#f0f0f0;color:#888;}
+.ac-card-preco{font-size:.8rem;color:var(--g);font-weight:600;margin-top:3px;}
+.ac-card-body{border-top:1px solid var(--lgray);padding:12px 14px;display:none;font-size:.78rem;color:var(--dark);}
+.ac-card.open .ac-card-body{display:block;}
+.ac-card-row{display:flex;gap:8px;margin-bottom:6px;}
+.ac-card-lbl{color:var(--gray);font-size:.7rem;min-width:80px;}
+.ac-card-val{font-weight:500;}
+.ac-card-actions{display:flex;gap:8px;margin-top:10px;}
+.ac-edit-btn{background:var(--gp);color:var(--g);border:1px solid var(--gl);border-radius:8px;padding:5px 12px;font-size:.75rem;cursor:pointer;font-weight:600;}
+.ac-del-btn{background:#fff0f0;color:#c0392b;border:1px solid #fcc;border-radius:8px;padding:5px 12px;font-size:.75rem;cursor:pointer;font-weight:600;}
 .album-header{display:flex;align-items:center;padding:13px 14px;cursor:pointer;gap:10px;user-select:none;}
 .album-header:active{background:var(--gp);}
 .album-icon{font-size:1.3rem;}
@@ -559,26 +578,36 @@ table.t tr:nth-child(even) td{background:var(--gp);}
   </div>
 
   <div class="panel" id="ac-panel-fixa">
-    <div class="acbox">
-      <h3>🏡 Acomodação Fixa</h3>
-      <input class="acinp" id="ac-f-nome" placeholder="Nome / Landlord" oninput="saveAc('fixa')">
-      <input class="acinp" id="ac-f-end" placeholder="Endereço" oninput="saveAc('fixa')">
+    <!-- Formulário nova acomodação -->
+    <div class="acbox" id="ac-form-box">
+      <h3 id="ac-form-title">🏡 Nova Acomodação</h3>
+      <input class="acinp" id="acf-nome" placeholder="Nome / Landlord *">
+      <input class="acinp" id="acf-end" placeholder="Endereço *">
+      <input class="acinp" id="acf-preco" placeholder="Preço / mês (€)">
+      <input class="acinp" id="acf-contato" placeholder="Contato (telefone, email...)">
       <div class="acrow">
-        <input class="acinp" id="ac-f-preco" placeholder="Preço / mês" oninput="saveAc('fixa')">
-        <input class="acinp" id="ac-f-contato" placeholder="Contato" oninput="saveAc('fixa')">
+        <input class="acinp" id="acf-entrada" type="date" placeholder="Data de entrada">
+        <div style="flex:1;position:relative">
+          <input class="acinp" id="acf-saida" type="date" placeholder="Data de saída" style="width:100%;box-sizing:border-box">
+          <label style="display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--gray);margin-top:4px;cursor:pointer">
+            <input type="checkbox" id="acf-atual" onchange="toggleAtualCheck()"> Atual (sem saída definida)
+          </label>
+        </div>
       </div>
-      <input class="acinp" id="ac-f-obs" placeholder="Observações (quartos, bills inclusos...)" oninput="saveAc('fixa')">
-      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-        <button class="acsave" onclick="saveAc('fixa')">💾 Salvar</button>
-        <span id="ac-saved-fixa" style="font-size:.66rem;color:var(--gl);"></span>
+      <textarea class="acinp" id="acf-obs" placeholder="Observações (quartos, bills inclusos, wifi...)" rows="3" style="resize:vertical"></textarea>
+      <input type="hidden" id="acf-edit-id">
+      <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+        <button class="acsave" onclick="saveAcFixa()">💾 Salvar</button>
+        <button class="acsave" onclick="cancelAcForm()" style="background:var(--lgray);color:var(--dark);display:none" id="ac-cancel-btn">✕ Cancelar</button>
       </div>
     </div>
-    <div class="stitle">📎 Documentos</div>
-    <div class="docg" id="ac-docs-fixa"></div>
-    <div class="stitle">📸 Fotos</div>
-    <div class="regg" id="ac-photos-fixa">
-      <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'ac-photos-fixa')"><span class="plus">➕</span><p>Fotos</p></div>
+
+    <!-- Lista de acomodações -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px">
+      <div class="stitle" style="margin:0">🏠 Minhas Acomodações</div>
+      <button onclick="showAcForm()" class="add-btn" style="font-size:.75rem;padding:5px 10px">➕ Adicionar</button>
     </div>
+    <div id="ac-fixas-list"></div>
   </div>
 </div>
 
@@ -1341,16 +1370,35 @@ async function buildDocSlots(containerId, slots) {
 }
 function addDocFile(input, id) {
   if (!DS[id]) DS[id] = [];
-  Array.from(input.files).forEach(file => {
-    const r = new FileReader();
-    r.onload = async e => {
-      const row = { slot_id: id, name: file.name, type: file.type, data: e.target.result };
-      const saved = await dbInsert('cork_docs', row);
-      DS[id].push({ id: saved?.id || Date.now().toString(), ...row });
-      renderDocSlot(id);
-      showSyncToast('☁️ Documento salvo na nuvem!', 'ok');
-    };
-    r.readAsDataURL(file);
+  Array.from(input.files).forEach(async file => {
+    try {
+      showSyncToast('📄 Salvando documento...', 'info');
+      const ext = file.name.split('.').pop() || 'bin';
+      const path = 'docs/' + id + '/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      // Tenta Storage para arquivos grandes
+      const { data: upData, error: upErr } = await sb.storage.from('cork-fotos').upload(path, file, { upsert: false });
+      if (!upErr) {
+        const { data: urlData } = sb.storage.from('cork-fotos').getPublicUrl(path);
+        const url = urlData.publicUrl;
+        const saved = await dbInsert('cork_docs', { slot_id: id, name: file.name, type: file.type, data: url });
+        DS[id].push({ id: saved?.id || Date.now().toString(), name: file.name, type: file.type, data: url, path });
+        renderDocSlot(id);
+        showSyncToast('☁️ Documento salvo na nuvem!', 'ok');
+      } else {
+        // Fallback base64 para arquivos pequenos
+        const r = new FileReader();
+        r.onload = async e => {
+          const row = { slot_id: id, name: file.name, type: file.type, data: e.target.result };
+          const saved = await dbInsert('cork_docs', row);
+          DS[id].push({ id: saved?.id || Date.now().toString(), ...row });
+          renderDocSlot(id);
+          showSyncToast('☁️ Documento salvo!', 'ok');
+        };
+        r.readAsDataURL(file);
+      }
+    } catch(err) {
+      showSyncToast('⚠️ Erro ao salvar: ' + err.message, 'error');
+    }
   });
   input.value = '';
 }
@@ -1408,6 +1456,7 @@ buildDocSlots('ac-docs-fixa', AC_DOCS_F);
 // NOTES + ATTACHMENTS
 // ─────────────────────────────────────────────
 const NT = {}, NTmr = {};
+// Anotações carregadas na inicialização via IIFE abaixo
 function autoSave(id) {
   clearTimeout(NTmr[id]);
   NTmr[id] = setTimeout(async () => {
@@ -2319,6 +2368,161 @@ async function doTranslate() {
     out.textContent = '⚠️ Sem conexão. Verifique a internet.';
   }
 }
+
+// ─────────────────────────────────────────────
+// ACOMODAÇÕES FIXAS — histórico
+// ─────────────────────────────────────────────
+let acFixas = [];
+
+function toggleAtualCheck() {
+  const cb = document.getElementById('acf-atual');
+  const inp = document.getElementById('acf-saida');
+  if (inp) { inp.disabled = cb.checked; if (cb.checked) inp.value = ''; }
+}
+
+function showAcForm(editId) {
+  const box = document.getElementById('ac-form-box');
+  const cancelBtn = document.getElementById('ac-cancel-btn');
+  if (box) box.style.display = 'block';
+  if (cancelBtn) cancelBtn.style.display = '';
+  if (!editId) {
+    // limpa form
+    ['acf-nome','acf-end','acf-preco','acf-contato','acf-entrada','acf-saida','acf-obs'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('acf-atual').checked = false;
+    document.getElementById('acf-saida').disabled = false;
+    document.getElementById('acf-edit-id').value = '';
+    document.getElementById('ac-form-title').textContent = '🏡 Nova Acomodação';
+  }
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelAcForm() {
+  const box = document.getElementById('ac-form-box');
+  const cancelBtn = document.getElementById('ac-cancel-btn');
+  if (box) box.style.display = 'none';
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  document.getElementById('acf-edit-id').value = '';
+}
+
+function editAcFixa(id) {
+  const ac = acFixas.find(a => a.id === id); if (!ac) return;
+  document.getElementById('acf-nome').value = ac.nome || '';
+  document.getElementById('acf-end').value = ac.endereco || '';
+  document.getElementById('acf-preco').value = ac.preco || '';
+  document.getElementById('acf-contato').value = ac.contato || '';
+  document.getElementById('acf-entrada').value = ac.entrada || '';
+  document.getElementById('acf-saida').value = ac.saida || '';
+  document.getElementById('acf-obs').value = ac.obs || '';
+  document.getElementById('acf-edit-id').value = id;
+  document.getElementById('acf-atual').checked = !ac.saida;
+  document.getElementById('acf-saida').disabled = !ac.saida;
+  document.getElementById('ac-form-title').textContent = '✏️ Editar Acomodação';
+  showAcForm(id);
+}
+
+async function saveAcFixa() {
+  const nome = document.getElementById('acf-nome')?.value.trim();
+  if (!nome) { alert('Digite o nome da acomodação!'); return; }
+  const editId = document.getElementById('acf-edit-id')?.value;
+  const atual = document.getElementById('acf-atual')?.checked;
+  const ac = {
+    nome,
+    endereco: document.getElementById('acf-end')?.value.trim() || '',
+    preco: document.getElementById('acf-preco')?.value.trim() || '',
+    contato: document.getElementById('acf-contato')?.value.trim() || '',
+    entrada: document.getElementById('acf-entrada')?.value || '',
+    saida: atual ? '' : (document.getElementById('acf-saida')?.value || ''),
+    obs: document.getElementById('acf-obs')?.value.trim() || '',
+    atual: atual ? true : false,
+    updated_at: new Date().toISOString()
+  };
+
+  if (editId) {
+    // Editar existente
+    ac.id = editId;
+    await dbUpsert('cork_acomodacao', ac);
+    const idx = acFixas.findIndex(a => a.id === editId);
+    if (idx >= 0) acFixas[idx] = ac;
+  } else {
+    // Nova
+    const saved = await dbInsert('cork_acomodacao', ac);
+    ac.id = saved?.id || ('local_' + Date.now());
+    acFixas.push(ac);
+  }
+
+  renderAcFixas();
+  cancelAcForm();
+  showSyncToast('🏠 Acomodação salva!', 'ok');
+}
+
+async function delAcFixa(id) {
+  if (!confirm('Remover esta acomodação?')) return;
+  await dbDelete('cork_acomodacao', { id });
+  acFixas = acFixas.filter(a => a.id !== id);
+  renderAcFixas();
+}
+
+function toggleAcCard(id) {
+  const card = document.getElementById('ac-card-' + id);
+  if (card) card.classList.toggle('open');
+}
+
+function fmtDate(str) {
+  if (!str) return '—';
+  const [y,m,d] = str.split('-');
+  return d + '/' + m + '/' + y;
+}
+
+function renderAcFixas() {
+  const container = document.getElementById('ac-fixas-list'); if (!container) return;
+  if (!acFixas.length) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--gray);font-size:.82rem">🏠 Nenhuma acomodação salva ainda.<br>Clique em ➕ Adicionar para começar!</div>';
+    return;
+  }
+  // Ordena: atual primeiro, depois por data de entrada mais recente
+  const sorted = [...acFixas].sort((a,b) => {
+    if (a.atual && !b.atual) return -1;
+    if (!a.atual && b.atual) return 1;
+    return (b.entrada || '').localeCompare(a.entrada || '');
+  });
+  container.innerHTML = sorted.map(ac => `
+    <div class="ac-card" id="ac-card-${ac.id}">
+      <div class="ac-card-header" onclick="toggleAcCard('${ac.id}')">
+        <div class="ac-card-icon">${ac.atual ? '🏡' : '📦'}</div>
+        <div class="ac-card-info">
+          <div class="ac-card-nome">${ac.nome}</div>
+          <div class="ac-card-end">📍 ${ac.endereco || 'Sem endereço'}</div>
+          ${ac.preco ? `<div class="ac-card-preco">€ ${ac.preco} / mês</div>` : ''}
+          <span class="ac-card-badge ${ac.atual ? 'atual' : 'passada'}">${ac.atual ? '✅ Atual' : '📅 ' + fmtDate(ac.entrada) + ' → ' + fmtDate(ac.saida)}</span>
+        </div>
+        <span style="font-size:.8rem;color:var(--gray);align-self:center">›</span>
+      </div>
+      <div class="ac-card-body">
+        <div class="ac-card-row"><span class="ac-card-lbl">Entrada:</span><span class="ac-card-val">${fmtDate(ac.entrada)}</span></div>
+        <div class="ac-card-row"><span class="ac-card-lbl">Saída:</span><span class="ac-card-val">${ac.atual ? '🟢 Morando aqui' : fmtDate(ac.saida)}</span></div>
+        ${ac.contato ? `<div class="ac-card-row"><span class="ac-card-lbl">Contato:</span><span class="ac-card-val">${ac.contato}</span></div>` : ''}
+        ${ac.obs ? `<div class="ac-card-row"><span class="ac-card-lbl">Obs:</span><span class="ac-card-val">${ac.obs}</span></div>` : ''}
+        <div class="ac-card-actions">
+          <button class="ac-edit-btn" onclick="editAcFixa('${ac.id}')">✏️ Editar</button>
+          <button class="ac-del-btn" onclick="delAcFixa('${ac.id}')">🗑️ Remover</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// Carrega acomodações do Supabase
+(async function() {
+  const rows = await dbGet('cork_acomodacao');
+  if (rows && rows.length) {
+    acFixas = rows.map(r => ({
+      id: r.id, nome: r.nome, endereco: r.endereco, preco: r.preco,
+      contato: r.contato, entrada: r.entrada, saida: r.saida, obs: r.obs, atual: r.atual
+    }));
+  }
+  renderAcFixas();
+  // Esconde form por padrão se já tem acomodações
+  if (acFixas.length > 0) cancelAcForm();
+})();
 
 console.log('🍀 Thales — Intercâmbio Cork 2026 pronto!');
 // Restaurar última página visitada
