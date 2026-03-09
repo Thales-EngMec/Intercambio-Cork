@@ -322,16 +322,27 @@ table.t tr:nth-child(even) td{background:var(--gp);}
 .msv.bad{color:var(--red);}
 
 /* ── GALERIA / REGISTROS ── */
-.regg{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:7px;margin-bottom:10px;}
+.regg{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;padding:12px;}
 .regitem{border-radius:8px;overflow:hidden;aspect-ratio:1;cursor:pointer;background:var(--lgray);position:relative;}
 .regitem img{width:100%;height:100%;object-fit:cover;transition:transform .2s;}
 .regitem:hover img{transform:scale(1.05);}
-.regdel{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.regadd{background:var(--w);border-radius:8px;border:2px dashed var(--lgray);aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border-color .15s;}
+.regdel{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.regadd{background:var(--gp);border-radius:8px;border:2px dashed var(--gl);aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border-color .15s;}
 .regadd:hover{border-color:var(--g);background:var(--gp);}
 .regadd input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.regadd .plus{font-size:1.5rem;color:var(--lgray);}
-.regadd p{font-size:.62rem;color:var(--gray);margin-top:3px;}
+.regadd .plus{font-size:1.3rem;color:var(--g);}
+.regadd p{font-size:.58rem;color:var(--g);margin-top:2px;font-weight:500;}
+/* Album cards */
+.album-card{background:var(--w);border-radius:12px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:10px;overflow:hidden;}
+.album-header{display:flex;align-items:center;padding:13px 14px;cursor:pointer;gap:10px;user-select:none;}
+.album-header:active{background:var(--gp);}
+.album-icon{font-size:1.3rem;}
+.album-title{flex:1;font-weight:600;font-size:.9rem;color:var(--dark);}
+.album-count{font-size:.75rem;color:var(--gray);background:var(--lgray);padding:2px 8px;border-radius:20px;}
+.album-arrow{font-size:.8rem;color:var(--gray);transition:transform .2s;}
+.album-card.open .album-arrow{transform:rotate(90deg);}
+.album-body{display:none;border-top:1px solid var(--lgray);}
+.album-card.open .album-body{display:block;}
 
 /* ── TRADUTOR ── */
 .tbox{background:var(--w);border-radius:11px;padding:12px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:10px;}
@@ -857,21 +868,61 @@ table.t tr:nth-child(even) td{background:var(--gp);}
 <!-- ═══════════════ REGISTROS ═══════════════ -->
 <div class="pg" id="pg-registros">
   <div class="ph"><h2>📸 Registros</h2><p>Suas memórias do intercâmbio!</p></div>
-  <div class="stitle">🍀 Álbum Geral</div>
-  <div class="regg" id="reg-main">
-    <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-main')"><span class="plus">➕</span><p>Adicionar fotos</p></div>
+
+  <div class="album-card" id="album-reg-main">
+    <div class="album-header" onclick="toggleAlbum('reg-main')">
+      <span class="album-icon">🍀</span>
+      <span class="album-title">Álbum Geral</span>
+      <span class="album-count" id="count-reg-main">0 fotos</span>
+      <span class="album-arrow">›</span>
+    </div>
+    <div class="album-body">
+      <div class="regg" id="reg-main">
+        <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-main')"><span class="plus">＋</span><p>Adicionar</p></div>
+      </div>
+    </div>
   </div>
-  <div class="stitle">🎓 Na Escola</div>
-  <div class="regg" id="reg-escola">
-    <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-escola')"><span class="plus">➕</span><p>Adicionar fotos</p></div>
+
+  <div class="album-card" id="album-reg-escola">
+    <div class="album-header" onclick="toggleAlbum('reg-escola')">
+      <span class="album-icon">🎓</span>
+      <span class="album-title">Na Escola</span>
+      <span class="album-count" id="count-reg-escola">0 fotos</span>
+      <span class="album-arrow">›</span>
+    </div>
+    <div class="album-body">
+      <div class="regg" id="reg-escola">
+        <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-escola')"><span class="plus">＋</span><p>Adicionar</p></div>
+      </div>
+    </div>
   </div>
-  <div class="stitle">🌍 Viagens</div>
-  <div class="regg" id="reg-viagens">
-    <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-viagens')"><span class="plus">➕</span><p>Adicionar fotos</p></div>
+
+  <div class="album-card" id="album-reg-viagens">
+    <div class="album-header" onclick="toggleAlbum('reg-viagens')">
+      <span class="album-icon">🌍</span>
+      <span class="album-title">Viagens</span>
+      <span class="album-count" id="count-reg-viagens">0 fotos</span>
+      <span class="album-arrow">›</span>
+    </div>
+    <div class="album-body">
+      <div class="regg" id="reg-viagens">
+        <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-viagens')"><span class="plus">＋</span><p>Adicionar</p></div>
+      </div>
+    </div>
   </div>
-  <div class="stitle">👥 Amigos</div>
-  <div class="regg" id="reg-amigos">
-    <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-amigos')"><span class="plus">➕</span><p>Adicionar fotos</p></div>
+
+  <div class="album-card" id="album-reg-amigos">
+    <div class="album-header" onclick="toggleAlbum('reg-amigos')">
+      <span class="album-icon">👥</span>
+      <span class="album-title">Amigos</span>
+      <span class="album-count" id="count-reg-amigos">0 fotos</span>
+      <span class="album-arrow">›</span>
+    </div>
+    <div class="album-body">
+      <div class="regg" id="reg-amigos">
+        <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-amigos')"><span class="plus">＋</span><p>Adicionar</p></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1441,24 +1492,57 @@ async function saveAc(type) {
 // PHOTOS / REGISTROS
 // ─────────────────────────────────────────────
 const PHOTOS = {};
+function compressImage(dataUrl, maxW, quality) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxW / img.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
+  });
+}
 function addPhoto(input, galleryId) {
   if (!PHOTOS[galleryId]) PHOTOS[galleryId] = [];
   Array.from(input.files).forEach(file => {
     const r = new FileReader();
     r.onload = async e => {
-      const row = { album: galleryId, name: file.name, data: e.target.result };
+      showSyncToast('📸 Salvando foto...', 'info');
+      // Comprime para max 800px e qualidade 0.7
+      const compressed = await compressImage(e.target.result, 800, 0.7);
+      const row = { album: galleryId, name: file.name, data: compressed };
       const saved = await dbInsert('cork_fotos', row);
-      PHOTOS[galleryId].push({ id: saved?.id || Date.now().toString(), ...row });
-      renderGallery(galleryId);
-      showSyncToast('📸 Foto salva na nuvem!', 'ok');
+      if (saved) {
+        PHOTOS[galleryId].push({ id: saved.id, ...row });
+        renderGallery(galleryId);
+        // Abre o álbum automaticamente
+        const card = document.getElementById('album-' + galleryId);
+        if (card && !card.classList.contains('open')) card.classList.add('open');
+        showSyncToast('📸 Foto salva na nuvem!', 'ok');
+      } else {
+        showSyncToast('⚠️ Erro ao salvar foto', 'error');
+      }
     };
     r.readAsDataURL(file);
   }); input.value = '';
 }
+function toggleAlbum(id) {
+  const card = document.getElementById('album-' + id);
+  if (card) card.classList.toggle('open');
+}
+function updateAlbumCount(id) {
+  const el = document.getElementById('count-' + id);
+  if (el) { const n = (PHOTOS[id] || []).length; el.textContent = n + (n === 1 ? ' foto' : ' fotos'); }
+}
 function renderGallery(id) {
   const g = document.getElementById(id); if (!g) return;
   g.innerHTML = (PHOTOS[id] || []).map((p, i) => `<div class="regitem"><img src="${p.data||p}" onclick="openLB('${p.data||p}')"><button class="regdel" onclick="delPhoto('${id}','${p.id||i}',${i})">✕</button></div>`).join('') +
-    `<div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'${id}')"><span class="plus">➕</span><p>Adicionar</p></div>`;
+    `<div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'${id}')"><span class="plus">＋</span><p>Adicionar</p></div>`;
+  updateAlbumCount(id);
 }
 async function delPhoto(id, rowId, i) {
   if (!isNaN(rowId)) { PHOTOS[id].splice(i, 1); renderGallery(id); return; }
