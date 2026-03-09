@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Thales 🍀 Cork 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="theme-color" content="#1a5c2e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="🍀 Cork 2026">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{
+  --g:#1a5c2e;--gl:#2d8a4e;--gp:#e8f5ed;--gd:#0f3a1c;
+  --o:#FF883E;--ol:#fff3ea;
+  --gold:#c8932a;--goldl:#f0c060;
+  --cream:#f5f7f5;--w:#fff;
+  --dark:#1a1a1a;--gray:#6b7280;--lgray:#e5e7eb;
+  --red:#d63a3a;--blue:#2563eb;
+  --irl:#169B62;
+  --sh:0 2px 12px rgba(26,92,46,.08);
+  --shm:0 6px 24px rgba(26,92,46,.13);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);}
+body{display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── HEADER ── */
+.hdr{background:var(--g);color:#fff;display:flex;align-items:center;padding:0 14px;height:52px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:200;gap:10px;}
+.hdr-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;flex:1;line-height:1.1;}
+.hdr-title small{display:block;font-size:.57rem;color:rgba(255,255,255,.48);font-family:'DM Sans',sans-serif;font-weight:400;margin-top:1px;}
+.hdr-flag{font-size:1.45rem;}
+.sync-btn{background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.75);border-radius:8px;padding:4px 9px;font-size:.7rem;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;}
+.sync-spin{display:inline-block;}
+.sync-spin.spinning{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── PULL TO REFRESH ── */
+.ptr-bar{position:fixed;top:52px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;border-radius:0 0 16px 16px;padding:4px 16px;font-size:.7rem;z-index:300;display:none;align-items:center;gap:5px;box-shadow:var(--shm);}
+.ptr-bar.show{display:flex;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:218px;background:var(--g);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;}
+.nl{padding:10px 13px 3px;font-size:.55rem;text-transform:uppercase;letter-spacing:1.1px;color:rgba(255,255,255,.3);font-weight:600;}
+.ni{display:flex;align-items:center;gap:8px;padding:8px 13px;cursor:pointer;border-left:3px solid transparent;font-size:.79rem;color:rgba(255,255,255,.65);transition:all .12s;}
+.ni:hover{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--goldl);}
+.ni.on{background:rgba(255,255,255,.12);color:#fff;border-left-color:var(--goldl);font-weight:500;}
+.ni .ic{font-size:.82rem;width:15px;text-align:center;flex-shrink:0;}
+.sdiv{height:1px;background:rgba(255,255,255,.09);margin:4px 0;}
+.sf{margin-top:auto;padding:8px 11px;font-size:.54rem;color:rgba(255,255,255,.26);text-align:center;border-top:1px solid rgba(255,255,255,.07);}
+
+/* ── MAIN SCROLL ── */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;}
+.pg{display:none;padding:16px 18px 20px;}
+.pg.on{display:block;}
+
+/* ── BOTTOM NAV ── */
+.bnav{display:none;background:var(--g);flex-shrink:0;padding:4px 0 max(4px,env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.09);}
+.bnitems{display:flex;justify-content:space-around;}
+.bni{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 5px;cursor:pointer;color:rgba(255,255,255,.48);border:none;background:none;font-family:'DM Sans',sans-serif;min-width:42px;}
+.bni.on{color:var(--goldl);}
+.bni .bi{font-size:1.05rem;}
+.bni .bl{font-size:.51rem;text-transform:uppercase;letter-spacing:.3px;}
+
+/* ── PAGE HEADING ── */
+.ph h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--g);}
+.ph p{color:var(--gray);font-size:.79rem;margin-top:2px;margin-bottom:13px;}
+.stitle{font-family:'Playfair Display',serif;font-size:.9rem;color:var(--g);margin:15px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--gp);}
+
+/* ── HERO BANDEIRA ── */
+.hero{border-radius:15px;overflow:hidden;box-shadow:var(--shm);margin-bottom:15px;}
+.hero-flag{display:grid;grid-template-columns:1fr 1fr 1fr;min-height:150px;}
+.hf-green{background:var(--irl);display:flex;flex-direction:column;justify-content:center;padding:18px;}
+.hf-green h1{font-family:'Playfair Display',serif;font-size:1.38rem;font-weight:900;color:#fff;line-height:1.2;}
+.hf-green p{font-size:.65rem;color:rgba(255,255,255,.76);margin-top:5px;}
+.hf-white{background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:13px;}
+.hf-white .fl{font-size:2rem;margin-bottom:3px;}
+.hf-white .dn{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:900;color:var(--irl);line-height:1;}
+.hf-white .dl{font-size:.58rem;text-transform:uppercase;letter-spacing:.6px;color:var(--gray);}
+.hf-orange{background:var(--o);display:flex;flex-direction:column;justify-content:center;padding:15px;gap:8px;}
+.hf-orange .dr .drl{font-size:.55rem;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.7);}
+.hf-orange .dr .drv{font-size:.8rem;font-weight:600;color:#fff;}
+.hero-stats{background:var(--gd);padding:10px 16px;display:flex;gap:12px;flex-wrap:wrap;}
+.hs{text-align:center;flex:1;min-width:60px;}
+.hs .sv{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--goldl);}
+.hs .sl{font-size:.56rem;color:rgba(255,255,255,.48);}
+
+/* ── CARDS GRID ── */
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:10px;margin-bottom:13px;}
+.card{background:var(--w);border-radius:11px;padding:13px;box-shadow:var(--sh);border:1px solid var(--lgray);}
+.card h3{font-family:'Playfair Display',serif;font-size:.85rem;color:var(--g);margin-bottom:3px;}
+.card p{font-size:.75rem;color:var(--gray);line-height:1.5;}
+.ci{font-size:1.2rem;margin-bottom:4px;}
+.chl{border-left:4px solid var(--g);background:linear-gradient(135deg,var(--gp),#fff);}
+.cwl{border-left:4px solid var(--gold);}
+.crl{border-left:4px solid var(--red);}
+
+/* ── INFO BOXES ── */
+.tip{background:linear-gradient(135deg,#e8f5ed,#f3fbf5);border-left:4px solid var(--g);border-radius:0 9px 9px 0;padding:9px 12px;margin-bottom:9px;font-size:.77rem;color:#1a4a2a;line-height:1.55;}
+.warn{background:#fef9ec;border-left:4px solid var(--gold);border-radius:0 9px 9px 0;padding:9px 12px;margin-bottom:9px;font-size:.77rem;color:#5a3d00;line-height:1.55;}
+.alrt{background:#fef2f2;border-left:4px solid var(--red);border-radius:0 9px 9px 0;padding:9px 12px;margin-bottom:9px;font-size:.77rem;color:#7a1a1a;line-height:1.55;}
+.livepill{display:inline-flex;align-items:center;gap:5px;background:var(--gp);color:var(--g);border-radius:20px;padding:3px 10px;font-size:.66rem;font-weight:500;margin-bottom:11px;}
+.ldot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── TABLE ── */
+.tw{background:var(--w);border-radius:11px;overflow:hidden;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:12px;}
+.tt{padding:9px 13px 7px;font-family:'Playfair Display',serif;font-size:.87rem;color:var(--g);border-bottom:1px solid var(--lgray);}
+table.t{width:100%;border-collapse:collapse;font-size:.76rem;}
+table.t th{background:var(--g);color:#fff;padding:6px 11px;text-align:left;font-weight:500;font-size:.7rem;}
+table.t td{padding:6px 11px;border-bottom:1px solid var(--lgray);}
+table.t tr:last-child td{border-bottom:none;}
+table.t tr:nth-child(even) td{background:var(--gp);}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.tab{padding:5px 12px;border-radius:20px;background:var(--w);border:1.5px solid var(--lgray);font-size:.74rem;cursor:pointer;color:var(--gray);transition:all .12s;font-family:'DM Sans',sans-serif;}
+.tab:hover{border-color:var(--g);color:var(--g);}
+.tab.on{background:var(--g);color:#fff;border-color:var(--g);}
+.panel{display:none;}.panel.on{display:block;}
+
+/* ── TWO COL ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:560px){.two{grid-template-columns:1fr;}}
+
+/* ── TIMELINE ── */
+.tl{position:relative;padding-left:20px;margin-bottom:13px;}
+.tl::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--g),var(--gold));}
+.tli{position:relative;margin-bottom:9px;background:var(--w);border-radius:10px;padding:10px 12px;box-shadow:var(--sh);border:1px solid var(--lgray);}
+.tli::before{content:'';position:absolute;left:-16px;top:14px;width:9px;height:9px;border-radius:50%;background:var(--g);border:2px solid var(--cream);box-shadow:0 0 0 2px var(--g);}
+.tli.done{opacity:.6;}
+.tli.done::before{background:var(--gold);box-shadow:0 0 0 2px var(--gold);}
+.tl-date{font-size:.62rem;color:var(--gold);font-weight:600;text-transform:uppercase;margin-bottom:2px;}
+.tli h4{font-size:.83rem;font-weight:600;color:var(--g);margin-bottom:2px;}
+.tli p{font-size:.74rem;color:var(--gray);line-height:1.45;}
+.tl-btn{margin-top:6px;background:var(--gp);color:var(--g);border:1px solid var(--g);border-radius:6px;padding:3px 10px;font-size:.7rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.tl-btn:hover{background:var(--g);color:#fff;}
+.tl-btn.done{background:#22c55e;color:#fff;border-color:#22c55e;}
+
+/* ── CHECKLIST ── */
+.cklist{background:var(--w);border-radius:11px;padding:12px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:10px;}
+.cklist h3{font-family:'Playfair Display',serif;font-size:.87rem;color:var(--g);margin-bottom:7px;}
+.cki{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--lgray);cursor:pointer;user-select:none;}
+.cki:last-child{border-bottom:none;}
+.ckb{width:16px;height:16px;border-radius:4px;border:2px solid var(--lgray);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.cki.on .ckb{background:var(--g);border-color:var(--g);}
+.ckm{display:none;color:#fff;font-size:.65rem;font-weight:700;}
+.cki.on .ckm{display:block;}
+.cki label{font-size:.77rem;cursor:pointer;line-height:1.4;}
+.cki.on label{text-decoration:line-through;color:var(--gray);}
+
+/* ── DOCUMENTOS ── */
+.docg{display:grid;grid-template-columns:repeat(auto-fill,minmax(142px,1fr));gap:9px;margin-bottom:10px;}
+.dslot{background:var(--w);border-radius:10px;border:2px dashed var(--lgray);overflow:hidden;transition:border-color .15s;}
+.dslot:hover{border-color:var(--g);}
+.dslot.has{border-style:solid;border-color:var(--g);}
+.dhead{padding:11px 9px;text-align:center;cursor:pointer;position:relative;}
+.dhead input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dico{font-size:1.35rem;margin-bottom:3px;}
+.dhead h4{font-size:.75rem;font-weight:600;color:var(--g);}
+.dhead p{font-size:.6rem;color:var(--gray);margin-top:1px;}
+.dfiles{border-top:1px solid var(--lgray);}
+.dfile{display:flex;align-items:center;gap:5px;padding:5px 8px;border-bottom:1px solid var(--lgray);font-size:.69rem;}
+.dfile:last-child{border-bottom:none;}
+.dfname{flex:1;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dark);}
+.dfname:hover{color:var(--g);text-decoration:underline;}
+.dfdel{background:none;border:none;color:var(--red);cursor:pointer;font-size:.72rem;}
+
+/* ── NOTAS ── */
+.nbox{background:var(--w);border-radius:11px;padding:12px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:10px;}
+.nbox h3{font-family:'Playfair Display',serif;font-size:.87rem;color:var(--g);margin-bottom:7px;}
+.nbox textarea{width:100%;min-height:75px;border:1px solid var(--lgray);border-radius:8px;padding:7px 9px;font-family:'DM Sans',sans-serif;font-size:.77rem;resize:vertical;outline:none;color:var(--dark);}
+.nbox textarea:focus{border-color:var(--g);}
+.nsaved{font-size:.61rem;color:var(--gl);height:13px;margin-top:2px;}
+.nattbtn{background:var(--gp);color:var(--g);border:1px solid var(--lgray);border-radius:6px;padding:3px 10px;font-size:.69rem;cursor:pointer;font-family:'DM Sans',sans-serif;position:relative;overflow:hidden;margin-top:5px;display:inline-block;}
+.nattbtn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.natts{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
+.natt{background:var(--gp);border-radius:5px;padding:2px 7px;font-size:.64rem;color:var(--g);display:flex;align-items:center;gap:4px;}
+.natt-n{cursor:pointer;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.natt-n:hover{text-decoration:underline;}
+.natt-d{background:none;border:none;color:var(--red);cursor:pointer;font-size:.67rem;}
+
+/* ── VOO / CRONOGRAMA VÔO ── */
+.fcard{background:var(--w);border-radius:11px;padding:13px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:8px;}
+.froute{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.fcode{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--g);}
+.farrow{color:var(--gold);}
+.fbadge{border-radius:6px;padding:2px 7px;font-size:.64rem;font-weight:500;}
+.fbadge.ok{background:#d1fae5;color:#065f46;}
+.fbadge.pend{background:#fef3cd;color:#7c5e10;}
+.finfo{font-size:.72rem;color:var(--gray);margin-bottom:4px;}
+.fedit-btn{background:none;border:1px solid var(--lgray);color:var(--gray);border-radius:6px;padding:3px 8px;font-size:.67rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.fedit-btn:hover{border-color:var(--g);color:var(--g);}
+.fedit-row{display:flex;gap:6px;margin-top:6px;align-items:center;}
+.fedit-inp{flex:1;border:1.5px solid var(--lgray);border-radius:7px;padding:5px 8px;font-size:.78rem;font-family:'DM Sans',sans-serif;outline:none;}
+.fedit-inp:focus{border-color:var(--g);}
+.fsave{background:var(--g);color:#fff;border:none;border-radius:7px;padding:5px 11px;font-size:.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* ── ROTEIRO ── */
+.rform-box{background:var(--w);border-radius:11px;padding:12px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:10px;}
+.rform-box h3{font-family:'Playfair Display',serif;font-size:.87rem;color:var(--g);margin-bottom:9px;}
+.rrow{display:flex;gap:7px;margin-bottom:7px;flex-wrap:wrap;}
+.rinp,.rsel{border:1.5px solid var(--lgray);border-radius:8px;padding:6px 9px;font-size:.78rem;font-family:'DM Sans',sans-serif;outline:none;color:var(--dark);flex:1;min-width:95px;}
+.rinp:focus,.rsel:focus{border-color:var(--g);}
+.rsave{background:var(--g);color:#fff;border:none;border-radius:8px;padding:6px 13px;font-size:.74rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;}
+.ritem{background:var(--gp);border-radius:9px;padding:9px 11px;margin-bottom:6px;border-left:4px solid var(--g);display:flex;gap:8px;align-items:flex-start;}
+.ritem.user{border-left-color:var(--o);}
+.ri-time{font-size:.65rem;font-weight:600;color:var(--gold);flex-shrink:0;min-width:40px;}
+.ri-body{flex:1;}
+.ri-title{font-size:.81rem;font-weight:600;color:var(--dark);}
+.ri-desc{font-size:.71rem;color:var(--gray);margin-top:1px;}
+.ri-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:.74rem;}
+
+/* ── ACOMODAÇÃO ── */
+.acbox{background:var(--w);border-radius:11px;padding:13px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:10px;}
+.acbox h3{font-family:'Playfair Display',serif;font-size:.87rem;color:var(--g);margin-bottom:9px;}
+.acinp{width:100%;border:1.5px solid var(--lgray);border-radius:8px;padding:7px 10px;font-size:.78rem;font-family:'DM Sans',sans-serif;outline:none;color:var(--dark);margin-bottom:7px;}
+.acinp:focus{border-color:var(--g);}
+.acrow{display:flex;gap:7px;}
+.acrow .acinp{flex:1;}
+.acsave{background:var(--g);color:#fff;border:none;border-radius:8px;padding:6px 13px;font-size:.74rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;}
+.acsaved{background:var(--gp);border-radius:8px;padding:9px 11px;font-size:.77rem;color:var(--g);margin-top:2px;}
+.acsaved strong{font-weight:600;}
+
+/* ── DESTINOS ── */
+.dcard{background:var(--w);border-radius:11px;overflow:hidden;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:9px;}
+.dc-hdr{padding:12px 14px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:space-between;}
+.dc-left{display:flex;align-items:center;gap:8px;}
+.dc-flag{font-size:1.7rem;}
+.dc-hdr h3{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;}
+.dc-hdr .tg{font-size:.65rem;opacity:.78;margin-top:1px;}
+.dc-right{display:flex;gap:5px;align-items:center;flex-shrink:0;}
+.dpill{background:rgba(255,255,255,.18);border-radius:12px;padding:2px 8px;font-size:.62rem;white-space:nowrap;}
+.chev{transition:transform .2s;font-size:.7rem;}
+.chev.op{transform:rotate(180deg);}
+.dc-body{padding:11px 13px;display:none;}
+.dc-body.op{display:block;}
+.cbrow{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;}
+.cb{background:var(--gp);color:var(--g);border-radius:6px;padding:3px 8px;font-size:.7rem;font-weight:500;}
+.attr-item{display:flex;gap:7px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--lgray);}
+.attr-item:last-child{border-bottom:none;}
+.attr-ico{font-size:.9rem;flex-shrink:0;margin-top:1px;}
+.attr-body-inner{flex:1;}
+.attr-name{font-size:.79rem;font-weight:600;color:var(--dark);}
+.attr-desc{font-size:.71rem;color:var(--gray);margin-top:1px;line-height:1.4;}
+.attr-row{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.ir-btn{background:var(--g);color:#fff;border:none;border-radius:6px;padding:3px 9px;font-size:.67rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;}
+.ir-btn:hover{background:var(--gl);}
+.ph-btn{background:none;border:1px solid var(--lgray);color:var(--gray);border-radius:6px;padding:3px 8px;font-size:.67rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.ph-btn:hover{border-color:var(--g);color:var(--g);}
+.attr-photo{margin-top:7px;border-radius:8px;overflow:hidden;display:none;}
+.attr-photo.op{display:block;}
+.attr-photo img{width:100%;max-height:180px;object-fit:cover;}
+.attr-photo-load{padding:8px;text-align:center;font-size:.7rem;color:var(--gray);}
+
+/* ── GUIA TOPBAR ── */
+.guide-topbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:11px;}
+.loc-btn{background:var(--g);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:.74rem;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;}
+.add-btn{background:var(--ol);color:#b85a00;border:1.5px solid #f5c48a;border-radius:8px;padding:5px 12px;font-size:.74rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;}
+.fav-btn{background:none;border:none;font-size:1.1rem;cursor:pointer;flex-shrink:0;line-height:1;padding:2px;transition:transform .15s;}
+.fav-btn:hover{transform:scale(1.2);}
+.fav-btn.on{filter:drop-shadow(0 0 4px gold);}
+
+/* ── GUIA DE CORK ── */
+.place-card{background:var(--w);border-radius:11px;padding:12px 13px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:8px;display:flex;align-items:flex-start;gap:11px;}
+.place-card.custom{border-left:3px solid var(--o);}
+.place-ico{font-size:1.55rem;flex-shrink:0;margin-top:2px;}
+.place-body{flex:1;min-width:0;}
+.place-name{font-size:.85rem;font-weight:600;color:var(--dark);margin-bottom:2px;}
+.place-desc{font-size:.73rem;color:var(--gray);line-height:1.45;margin-bottom:5px;}
+.place-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:5px;}
+.place-tag{background:var(--gp);color:var(--g);border-radius:12px;padding:1px 7px;font-size:.64rem;font-weight:500;}
+.place-dist{font-size:.72rem;color:var(--gray);font-weight:500;display:flex;align-items:center;gap:4px;}
+.place-dist.loaded{color:var(--g);font-weight:600;}
+.place-actions{display:flex;gap:5px;align-items:center;flex-shrink:0;flex-direction:column;}
+.place-ir{background:var(--g);color:#fff;border:none;border-radius:7px;padding:5px 12px;font-size:.73rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;white-space:nowrap;}
+.place-ir:hover{background:var(--gl);}
+.place-del{background:none;border:1px solid var(--lgray);color:var(--red);border-radius:7px;padding:3px 7px;font-size:.68rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.place-section-label{font-family:'Playfair Display',serif;font-size:.88rem;color:var(--g);padding:12px 0 6px;border-bottom:2px solid var(--gp);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.empty-fav{text-align:center;padding:32px 16px;color:var(--gray);font-size:.82rem;}
+.empty-fav .ef-ico{font-size:2.5rem;margin-bottom:8px;}
+
+
+
+/* ── DINHEIRO ── */
+.money-h{background:var(--g);border-radius:13px;padding:16px;color:#fff;text-align:center;margin-bottom:12px;box-shadow:var(--shm);}
+.money-h h2{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:2px;}
+.money-h p{font-size:.71rem;color:rgba(255,255,255,.6);}
+.rate-pill{background:var(--gp);color:var(--g);border-radius:9px;padding:7px 12px;font-size:.73rem;text-align:center;margin-bottom:11px;}
+.minp-row{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.mc{font-size:.93rem;font-weight:700;color:var(--g);flex-shrink:0;}
+.minp{flex:1;border:1.5px solid var(--lgray);border-radius:8px;padding:7px 10px;font-size:.9rem;font-family:'Playfair Display',serif;font-weight:700;outline:none;text-align:right;}
+.minp:focus{border-color:var(--g);}
+.mconv{font-size:.71rem;color:var(--gray);margin-top:2px;}
+.prog-bg{background:var(--lgray);border-radius:20px;height:8px;overflow:hidden;margin:5px 0;}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--g),var(--gl));border-radius:20px;transition:width .4s;}
+.mstat{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--lgray);}
+.mstat:last-child{border-bottom:none;}
+.msl{font-size:.75rem;color:var(--gray);}
+.msv{font-size:.82rem;font-weight:600;}
+.msv.good{color:#22c55e;}
+.msv.bad{color:var(--red);}
+
+/* ── GALERIA / REGISTROS ── */
+.regg{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:7px;margin-bottom:10px;}
+.regitem{border-radius:8px;overflow:hidden;aspect-ratio:1;cursor:pointer;background:var(--lgray);position:relative;}
+.regitem img{width:100%;height:100%;object-fit:cover;transition:transform .2s;}
+.regitem:hover img{transform:scale(1.05);}
+.regdel{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.regadd{background:var(--w);border-radius:8px;border:2px dashed var(--lgray);aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border-color .15s;}
+.regadd:hover{border-color:var(--g);background:var(--gp);}
+.regadd input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.regadd .plus{font-size:1.5rem;color:var(--lgray);}
+.regadd p{font-size:.62rem;color:var(--gray);margin-top:3px;}
+
+/* ── TRADUTOR ── */
+.tbox{background:var(--w);border-radius:11px;padding:12px;box-shadow:var(--sh);border:1px solid var(--lgray);margin-bottom:10px;}
+.tbox h3{font-family:'Playfair Display',serif;font-size:.87rem;color:var(--g);margin-bottom:8px;}
+.tlang{width:100%;border:1.5px solid var(--lgray);border-radius:8px;padding:7px 10px;font-size:.79rem;font-family:'DM Sans',sans-serif;outline:none;color:var(--dark);margin-bottom:8px;}
+.tlang:focus{border-color:var(--g);}
+.tarea{display:flex;gap:7px;margin-bottom:8px;}
+.tinp-t{flex:1;border:1.5px solid var(--lgray);border-radius:8px;padding:7px 9px;font-size:.78rem;font-family:'DM Sans',sans-serif;resize:vertical;min-height:63px;outline:none;}
+.tinp-t:focus{border-color:var(--g);}
+.tout{flex:1;border:1.5px solid var(--g);border-radius:8px;padding:7px 9px;font-size:.78rem;background:var(--gp);min-height:63px;color:var(--dark);line-height:1.5;}
+.tbtn{border:none;border-radius:8px;padding:6px 12px;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:4px;margin-right:5px;margin-bottom:8px;}
+.tbtn.green{background:var(--g);color:#fff;}
+.tbtn.orange{background:var(--o);color:#fff;}
+.pcat h4{font-size:.75rem;font-weight:600;color:var(--g);margin:9px 0 5px;}
+.pitem{display:flex;align-items:center;gap:5px;padding:5px 0;border-bottom:1px solid var(--lgray);font-size:.74rem;}
+.pitem:last-child{border-bottom:none;}
+.ppt{flex:1;color:var(--gray);}
+.ptr-t{flex:1;color:var(--dark);font-weight:500;}
+.pspk{background:none;border:none;cursor:pointer;font-size:.8rem;}
+
+/* ── LIGHTBOX ── */
+.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;align-items:center;justify-content:center;}
+.lb.op{display:flex;}
+.lb img{max-width:92%;max-height:92vh;border-radius:8px;}
+.lb-x{position:absolute;top:13px;right:13px;background:none;border:none;color:#fff;font-size:1.6rem;cursor:pointer;}
+
+/* ── LINKS LINHA ── */
+.linkrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.lnk{display:inline-flex;align-items:center;gap:4px;background:var(--w);border:1.5px solid var(--lgray);color:var(--dark);text-decoration:none;padding:5px 11px;border-radius:8px;font-size:.76rem;font-weight:500;transition:all .12s;}
+.lnk:hover{border-color:var(--g);color:var(--g);background:var(--gp);}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--lgray);border-radius:2px;}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);}
+
+/* ── MOBILE ── */
+@media(max-width:720px){
+  .sidebar{display:none;}
+  .bnav{display:block;}
+  .pg{padding:11px 13px 14px;}
+  .hero-flag{grid-template-columns:1fr;}
+  .hf-white{flex-direction:row;gap:12px;justify-content:center;padding:11px;}
+  .hf-white .fl{margin:0;}
+  .cg,.two{grid-template-columns:1fr;}
+  .hs .sv{font-size:.95rem;}
+
+  .docg{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));}
+  .regg{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));}
+}
+@media(min-width:721px){
+  .sidebar{display:flex;flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- PTR indicator -->
+<div class="ptr-bar" id="ptr-bar"><span class="sync-spin spinning">🔄</span> Atualizando...</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-title">Thales 🍀 Cork 2026<small>SEDA College · Irlanda</small></div>
+  <button class="sync-btn" onclick="syncAll()" title="Atualizar cotação"><span id="sync-ico">🔄</span> Sync</button>
+  <span class="hdr-flag">🇮🇪</span>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="nl">Principal</div>
+  <div class="ni on" onclick="goTo('home')"><span class="ic">🏠</span> Início</div>
+  <div class="ni" onclick="goTo('voo')"><span class="ic">✈️</span> Meu Voo</div>
+  <div class="ni" onclick="goTo('acomodacao')"><span class="ic">🏠</span> Acomodação</div>
+  <div class="ni" onclick="goTo('timeline')"><span class="ic">📅</span> Cronograma</div>
+  <div class="ni" onclick="goTo('checklist')"><span class="ic">✅</span> Checklist</div>
+  <div class="ni" onclick="goTo('documentos')"><span class="ic">📁</span> Documentos</div>
+  <div class="ni" onclick="goTo('notas')"><span class="ic">📝</span> Anotações</div>
+  <div class="sdiv"></div>
+  <div class="nl">Irlanda & Europa</div>
+  <div class="ni" onclick="goTo('roteiro')"><span class="ic">🗓️</span> Roteiro em Cork</div>
+  <div class="ni" onclick="goTo('viagens')"><span class="ic">✈️</span> Viagens Europa</div>
+  <div class="ni" onclick="goTo('cork')"><span class="ic">📍</span> Guia de Cork</div>
+  <div class="ni" onclick="goTo('europa')"><span class="ic">🌍</span> Guia Europa</div>
+  <div class="ni" onclick="goTo('tradutor')"><span class="ic">🗣️</span> Tradutor</div>
+  <div class="sdiv"></div>
+  <div class="nl">Finanças & Memórias</div>
+  <div class="ni" onclick="goTo('dinheiro')"><span class="ic">💶</span> Dinheiro</div>
+  <div class="ni" onclick="goTo('registros')"><span class="ic">📸</span> Registros</div>
+  <div class="sdiv"></div>
+  <div class="nl">Informações</div>
+  <div class="ni" onclick="goTo('info');openTab('fin')"><span class="ic">💰</span> Financeiro</div>
+  <div class="ni" onclick="goTo('info');openTab('emp')"><span class="ic">💼</span> Emprego</div>
+  <div class="ni" onclick="goTo('info');openTab('guia')"><span class="ic">🗺️</span> Guia Cork</div>
+  <div class="ni" onclick="goTo('info');openTab('dicas')"><span class="ic">💡</span> Dicas</div>
+  <div class="sf" id="sf-time">Atualizado agora</div>
+</div>
+
+<!-- MAIN SCROLL -->
+<div class="scroll" id="main-scroll">
+
+<!-- ═══════════════ INÍCIO ═══════════════ -->
+<div class="pg on" id="pg-home">
+  <div class="hero">
+    <div class="hero-flag">
+      <div class="hf-green">
+        <h1>Thales,<br>bora pra<br>Irlanda! 🍀</h1>
+        <p>📚 SEDA College · Cork</p>
+      </div>
+      <div class="hf-white">
+        <div class="fl">🇮🇪</div>
+        <div class="dn" id="home-days">—</div>
+        <div class="dl">dias para embarcar</div>
+      </div>
+      <div class="hf-orange">
+        <div class="dr"><div class="drl">✈️ Embarque</div><div class="drv">22 Set 2026</div></div>
+        <div class="dr"><div class="drl">📚 Aulas</div><div class="drv">28 Set 2026</div></div>
+        <div class="dr"><div class="drl">🏠 Retorno</div><div class="drv" id="home-ret">—</div></div>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><div class="sv">8</div><div class="sl">meses</div></div>
+      <div class="hs"><div class="sv">6</div><div class="sl">c/ aulas</div></div>
+      <div class="hs"><div class="sv">2</div><div class="sl">férias</div></div>
+      <div class="hs"><div class="sv" id="hw-stat">€14,15</div><div class="sl">salário/h</div></div>
+      <div class="hs"><div class="sv" id="hp-stat">€6.665</div><div class="sl">comprovação</div></div>
+    </div>
+  </div>
+  <div class="tip">🎄 Sua família vai te visitar em Dezembro 2026 — Natal em Dublin + Réveillon em Edimburgo!</div>
+  <div class="stitle">Próximos passos</div>
+  <div class="cg" id="home-next"></div>
+</div>
+
+<!-- ═══════════════ VOO ═══════════════ -->
+<div class="pg" id="pg-voo">
+  <div class="ph"><h2>✈️ Meu Voo</h2><p>Itinerário e informações do embarque</p></div>
+  <div id="voos-list"></div>
+  <div class="stitle">📋 Documentos de Bordo</div>
+  <div class="docg" id="voo-docs"></div>
+</div>
+
+<!-- ═══════════════ ACOMODAÇÃO ═══════════════ -->
+<div class="pg" id="pg-acomodacao">
+  <div class="ph"><h2>🏠 Acomodação</h2><p>Seu lar em Cork</p></div>
+
+  <div class="tabs">
+    <button class="tab on" onclick="openAcTab('inicial')">🏨 Inicial (2 sem.)</button>
+    <button class="tab" onclick="openAcTab('fixa')">🏡 Fixa</button>
+  </div>
+
+  <div class="panel on" id="ac-panel-inicial">
+    <div class="acbox">
+      <h3>🏨 Acomodação Inicial — 2 Semanas</h3>
+      <input class="acinp" id="ac-i-nome" placeholder="Nome do hostel / família anfitriã" oninput="saveAc('inicial')">
+      <input class="acinp" id="ac-i-end" placeholder="Endereço em Cork" oninput="saveAc('inicial')">
+      <div class="acrow">
+        <input class="acinp" id="ac-i-cin" placeholder="Check-in" oninput="saveAc('inicial')">
+        <input class="acinp" id="ac-i-cout" placeholder="Check-out" oninput="saveAc('inicial')">
+      </div>
+      <input class="acinp" id="ac-i-preco" placeholder="Preço / semana" oninput="saveAc('inicial')">
+      <input class="acinp" id="ac-i-obs" placeholder="Observações (contato, regras, wifi...)" oninput="saveAc('inicial')">
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <button class="acsave" onclick="saveAc('inicial')">💾 Salvar</button>
+        <span id="ac-saved-inicial" style="font-size:.66rem;color:var(--gl);"></span>
+      </div>
+    </div>
+    <div class="stitle">📎 Documentos da Acomodação</div>
+    <div class="docg" id="ac-docs-inicial"></div>
+    <div class="stitle">📸 Fotos</div>
+    <div class="regg" id="ac-photos-inicial">
+      <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'ac-photos-inicial')"><span class="plus">➕</span><p>Fotos</p></div>
+    </div>
+  </div>
+
+  <div class="panel" id="ac-panel-fixa">
+    <div class="acbox">
+      <h3>🏡 Acomodação Fixa</h3>
+      <input class="acinp" id="ac-f-nome" placeholder="Nome / Landlord" oninput="saveAc('fixa')">
+      <input class="acinp" id="ac-f-end" placeholder="Endereço" oninput="saveAc('fixa')">
+      <div class="acrow">
+        <input class="acinp" id="ac-f-preco" placeholder="Preço / mês" oninput="saveAc('fixa')">
+        <input class="acinp" id="ac-f-contato" placeholder="Contato" oninput="saveAc('fixa')">
+      </div>
+      <input class="acinp" id="ac-f-obs" placeholder="Observações (quartos, bills inclusos...)" oninput="saveAc('fixa')">
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <button class="acsave" onclick="saveAc('fixa')">💾 Salvar</button>
+        <span id="ac-saved-fixa" style="font-size:.66rem;color:var(--gl);"></span>
+      </div>
+    </div>
+    <div class="stitle">📎 Documentos</div>
+    <div class="docg" id="ac-docs-fixa"></div>
+    <div class="stitle">📸 Fotos</div>
+    <div class="regg" id="ac-photos-fixa">
+      <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'ac-photos-fixa')"><span class="plus">➕</span><p>Fotos</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ CRONOGRAMA ═══════════════ -->
+<div class="pg" id="pg-timeline">
+  <div class="ph"><h2>📅 Cronograma</h2><p>Marque cada etapa concluída!</p></div>
+  <div class="tl" id="tl-container"></div>
+</div>
+
+<!-- ═══════════════ CHECKLIST ═══════════════ -->
+<div class="pg" id="pg-checklist">
+  <div class="ph"><h2>✅ Checklist</h2><p>Tudo que você precisa fazer!</p></div>
+  <div class="two">
+    <div>
+      <div class="cklist">
+        <h3>📋 Documentos</h3>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Passagem comprada ✅</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Retirar novo passaporte (válido até Nov/2027)</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Carta de matrícula SEDA</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Confirmação acomodação inicial (2 semanas)</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Comprovação financeira em conta bancária</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Extrato bancário em inglês</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Seguro viagem/saúde (min. €30.000)</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Fotos 3x4</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Abrir conta Wise/Revolut no Brasil</label></div>
+      </div>
+      <div class="cklist">
+        <h3>🎒 Mala</h3>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Roupas de frio / casaco impermeável</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Adaptador Tipo G (tomada irlandesa)</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Remédios essenciais</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Notebook + carregadores</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Euros em espécie (para os primeiros dias)</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Comida brasileira ❤️🇧🇷</label></div>
+      </div>
+    </div>
+    <div>
+      <div class="cklist">
+        <h3>💼 Preparação</h3>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Estudar inglês intensivamente</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Fazer currículo em inglês</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Pesquisar bairros de Cork</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Entrar em grupos Facebook de Cork</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Baixar apps essenciais</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Comprar adaptador Tipo G</label></div>
+      </div>
+      <div class="cklist">
+        <h3>🍀 Primeiras Semanas na Irlanda</h3>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Pegar ônibus Dublin → Cork</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Comprar chip local (Three Irlanda)</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Abrir conta bancária local</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Solicitar IRP (Imigração)</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Solicitar PPS Number (CPF irlandês)</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Tirar Student Leap Card</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Buscar acomodação fixa</label></div>
+        <div class="cki" onclick="ck(this)"><div class="ckb"><span class="ckm">✓</span></div><label>Começar a procurar emprego</label></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DOCUMENTOS ═══════════════ -->
+<div class="pg" id="pg-documentos">
+  <div class="ph"><h2>📁 Meus Documentos</h2><p>Adicione e acesse tudo em um lugar!</p></div>
+  <div class="alrt">⚠️ Arquivos salvos neste aparelho. Mantenha backup no Google Drive!</div>
+  <div id="docs-main"></div>
+</div>
+
+<!-- ═══════════════ NOTAS ═══════════════ -->
+<div class="pg" id="pg-notas">
+  <div class="ph"><h2>📝 Anotações</h2><p>Salvo automaticamente!</p></div>
+  <div class="two">
+    <div>
+      <div class="nbox"><h3>📌 Geral</h3><textarea id="n-geral" oninput="autoSave('n-geral')" placeholder="Lembretes, ideias..."></textarea><div class="nsaved" id="ns-geral"></div><div class="nattbtn">📎 Anexar<input type="file" multiple onchange="noteAtt(this,'na-geral')"></div><div class="natts" id="na-geral"></div></div>
+      <div class="nbox"><h3>💼 Empregos</h3><textarea id="n-emp" oninput="autoSave('n-emp')" placeholder="Candidaturas, contatos, entrevistas..."></textarea><div class="nsaved" id="ns-emp"></div><div class="nattbtn">📎 Anexar<input type="file" multiple onchange="noteAtt(this,'na-emp')"></div><div class="natts" id="na-emp"></div></div>
+      <div class="nbox"><h3>🏠 Acomodações</h3><textarea id="n-ac" oninput="autoSave('n-ac')" placeholder="Quartos encontrados, preços, contatos..."></textarea><div class="nsaved" id="ns-ac"></div><div class="nattbtn">📎 Anexar<input type="file" multiple onchange="noteAtt(this,'na-ac')"></div><div class="natts" id="na-ac"></div></div>
+    </div>
+    <div>
+      <div class="nbox"><h3>✈️ Viagens</h3><textarea id="n-viag" oninput="autoSave('n-viag')" placeholder="Destinos planejados, passagens..."></textarea><div class="nsaved" id="ns-viag"></div><div class="nattbtn">📎 Anexar<input type="file" multiple onchange="noteAtt(this,'na-viag')"></div><div class="natts" id="na-viag"></div></div>
+      <div class="nbox"><h3>🏦 Financeiro</h3><textarea id="n-fin" oninput="autoSave('n-fin')" placeholder="Gastos, economias, transferências..."></textarea><div class="nsaved" id="ns-fin"></div><div class="nattbtn">📎 Anexar<input type="file" multiple onchange="noteAtt(this,'na-fin')"></div><div class="natts" id="na-fin"></div></div>
+      <div class="nbox"><h3>💡 Dicas Recebidas</h3><textarea id="n-dicas" oninput="autoSave('n-dicas')" placeholder="Dicas de colegas e irlandeses..."></textarea><div class="nsaved" id="ns-dicas"></div><div class="nattbtn">📎 Anexar<input type="file" multiple onchange="noteAtt(this,'na-dicas')"></div><div class="natts" id="na-dicas"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ROTEIRO EM CORK ═══════════════ -->
+<div class="pg" id="pg-roteiro">
+  <div class="ph"><h2>🗓️ Roteiro em Cork</h2><p>Planeje seus dias — você adiciona o que fará!</p></div>
+  <div class="rform-box">
+    <h3>➕ Adicionar atividade</h3>
+    <div class="rrow">
+      <input class="rinp" id="r-data" type="date" style="flex:1.2">
+      <input class="rinp" id="r-hora" type="time" placeholder="Horário">
+    </div>
+    <div class="rrow">
+      <input class="rinp" id="r-tit" placeholder="O que fazer?" style="flex:2">
+    </div>
+    <div class="rrow">
+      <input class="rinp" id="r-desc" placeholder="Descrição / detalhes...">
+    </div>
+    <div style="display:flex;gap:7px;align-items:center">
+      <button class="rsave" onclick="addRoteiro()">✅ Adicionar</button>
+      <span style="font-size:.7rem;color:var(--gray)">Ordenado por data/hora automaticamente</span>
+    </div>
+  </div>
+  <div id="roteiro-list"></div>
+  <div class="tip">💡 Use esta seção para planejar seus passeios em Cork e arredores — Cobh, Kinsale, Ring of Kerry!</div>
+</div>
+
+<!-- ═══════════════ VIAGENS EUROPA ═══════════════ -->
+<div class="pg" id="pg-viagens">
+  <div class="ph"><h2>✈️ Viagens pela Europa</h2><p>Destinos a explorar a partir de Cork!</p></div>
+  <div class="linkrow">
+    <a class="lnk" href="https://www.ryanair.com" target="_blank">✈️ Ryanair</a>
+    <a class="lnk" href="https://www.easyjet.com" target="_blank">✈️ EasyJet</a>
+    <a class="lnk" href="https://www.skyscanner.net" target="_blank">🔍 Skyscanner</a>
+    <a class="lnk" href="https://flights.google.com" target="_blank">✈️ Google Flights</a>
+    <a class="lnk" href="https://www.eurail.com" target="_blank">🚂 Eurail</a>
+    <a class="lnk" href="https://www.hostelworld.com" target="_blank">🏨 Hostelworld</a>
+  </div>
+  <div id="dest-list"></div>
+</div>
+
+<!-- ═══════════════ GUIA DE CORK ═══════════════ -->
+<div class="pg" id="pg-cork">
+  <div class="ph"><h2>📍 Guia de Cork</h2><p>Lugares essenciais — distância da sua localização</p></div>
+
+  <div class="guide-topbar">
+    <button onclick="getMyLocation('cork')" class="loc-btn">📡 Minha localização</button>
+    <button onclick="openAddPlace('cork')" class="add-btn">➕ Adicionar lugar</button>
+    <span id="cork-loc-status" style="font-size:.7rem;color:var(--gray);flex:1;text-align:right"></span>
+  </div>
+
+  <div class="tabs" id="cork-tabs" style="margin-bottom:10px">
+    <button class="tab on" onclick="filterGuide('cork','all')">🗺️ Tudo</button>
+    <button class="tab" onclick="filterGuide('cork','fav')">⭐ Favoritos</button>
+    <button class="tab" onclick="filterGuide('cork','meu')">📌 Meus Locais</button>
+    <button class="tab" onclick="filterGuide('cork','mercado')">🛒 Mercados</button>
+    <button class="tab" onclick="filterGuide('cork','shopping')">🛍️ Shopping</button>
+    <button class="tab" onclick="filterGuide('cork','restaurante')">🍽️ Comer</button>
+    <button class="tab" onclick="filterGuide('cork','fastfood')">🍔 Fast Food</button>
+    <button class="tab" onclick="filterGuide('cork','pub')">🍺 Pubs</button>
+    <button class="tab" onclick="filterGuide('cork','turistico')">🏰 Turístico</button>
+    <button class="tab" onclick="filterGuide('cork','saude')">💊 Saúde</button>
+    <button class="tab" onclick="filterGuide('cork','transporte')">🚌 Transporte</button>
+  </div>
+
+  <div id="cork-places-list"></div>
+</div>
+
+<!-- ═══════════════ GUIA EUROPA ═══════════════ -->
+<div class="pg" id="pg-europa">
+  <div class="ph"><h2>🌍 Guia Europa</h2><p>Lugares por país — para suas viagens a partir de Cork!</p></div>
+
+  <div class="guide-topbar">
+    <button onclick="getMyLocation('europa')" class="loc-btn">📡 Minha localização</button>
+    <button onclick="openAddPlace('europa')" class="add-btn">➕ Adicionar lugar</button>
+    <span id="europa-loc-status" style="font-size:.7rem;color:var(--gray);flex:1;text-align:right"></span>
+  </div>
+
+  <div class="tabs" id="europa-tabs" style="margin-bottom:10px">
+    <button class="tab on" onclick="filterGuide('europa','all')">🌍 Tudo</button>
+    <button class="tab" onclick="filterGuide('europa','fav')">⭐ Favoritos</button>
+    <button class="tab" onclick="filterGuide('europa','meu')">📌 Meus Locais</button>
+    <button class="tab" onclick="filterGuide('europa','ie')">🇮🇪 Irlanda</button>
+    <button class="tab" onclick="filterGuide('europa','pt')">🇵🇹 Portugal</button>
+    <button class="tab" onclick="filterGuide('europa','es')">🇪🇸 Espanha</button>
+    <button class="tab" onclick="filterGuide('europa','fr')">🇫🇷 França</button>
+    <button class="tab" onclick="filterGuide('europa','it')">🇮🇹 Itália</button>
+    <button class="tab" onclick="filterGuide('europa','de')">🇩🇪 Alemanha</button>
+    <button class="tab" onclick="filterGuide('europa','nl')">🇳🇱 Holanda</button>
+    <button class="tab" onclick="filterGuide('europa','gb')">🇬🇧 UK</button>
+    <button class="tab" onclick="filterGuide('europa','pl')">🇵🇱 Polônia</button>
+    <button class="tab" onclick="filterGuide('europa','is')">🇮🇸 Islândia</button>
+    <button class="tab" onclick="filterGuide('europa','ma')">🇲🇦 Marrocos</button>
+  </div>
+
+  <div id="europa-places-list"></div>
+</div>
+
+<!-- MODAL: Adicionar Lugar -->
+<div id="add-place-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:16px;padding:20px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.25)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--g)">➕ Adicionar Lugar</h3>
+      <button onclick="closeAddPlace()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--gray)">✕</button>
+    </div>
+    <input id="ap-nome" class="acinp" placeholder="Nome do lugar *" style="margin-bottom:8px">
+    <input id="ap-desc" class="acinp" placeholder="Descrição (opcional)" style="margin-bottom:8px">
+    <select id="ap-guia" class="acinp" style="margin-bottom:8px">
+      <option value="cork">📍 Guia de Cork</option>
+      <option value="europa">🌍 Guia Europa</option>
+    </select>
+    <select id="ap-cat" class="acinp" style="margin-bottom:8px">
+      <option value="mercado">🛒 Mercado/Supermercado</option>
+      <option value="restaurante">🍽️ Restaurante</option>
+      <option value="fastfood">🍔 Fast Food</option>
+      <option value="pub">🍺 Pub/Bar</option>
+      <option value="shopping">🛍️ Shopping/Loja</option>
+      <option value="turistico">🏰 Ponto Turístico</option>
+      <option value="saude">💊 Saúde</option>
+      <option value="transporte">🚌 Transporte</option>
+      <option value="outro">📍 Outro</option>
+    </select>
+    <select id="ap-pais" class="acinp" style="margin-bottom:8px;display:none">
+      <option value="ie">🇮🇪 Irlanda</option>
+      <option value="pt">🇵🇹 Portugal</option>
+      <option value="es">🇪🇸 Espanha</option>
+      <option value="fr">🇫🇷 França</option>
+      <option value="it">🇮🇹 Itália</option>
+      <option value="de">🇩🇪 Alemanha</option>
+      <option value="nl">🇳🇱 Holanda</option>
+      <option value="gb">🇬🇧 Reino Unido</option>
+      <option value="pl">🇵🇱 Polônia</option>
+      <option value="is">🇮🇸 Islândia</option>
+      <option value="ma">🇲🇦 Marrocos</option>
+    </select>
+    <div style="font-size:.76rem;color:var(--g);font-weight:600;margin-bottom:6px">📍 Localização</div>
+    <div style="display:flex;gap:7px;margin-bottom:8px">
+      <input id="ap-addr" class="acinp" placeholder="Endereço ou nome do lugar" style="flex:1;margin:0">
+      <button onclick="useMyLocForPlace()" style="background:var(--g);color:#fff;border:none;border-radius:8px;padding:6px 11px;font-size:.73rem;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0">📡 Usar atual</button>
+    </div>
+    <div style="display:flex;gap:7px;margin-bottom:12px">
+      <input id="ap-lat" class="acinp" placeholder="Lat (ex: 51.8985)" type="number" step=".0001" style="flex:1;margin:0">
+      <input id="ap-lng" class="acinp" placeholder="Lng (ex: -8.4756)" type="number" step=".0001" style="flex:1;margin:0">
+    </div>
+    <div id="ap-loc-msg" style="font-size:.7rem;color:var(--gray);margin-bottom:8px"></div>
+    <button onclick="saveAddPlace()" style="background:var(--g);color:#fff;border:none;border-radius:9px;padding:8px 0;font-size:.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;width:100%">✅ Salvar Lugar</button>
+  </div>
+</div>
+
+<!-- ═══════════════ TRADUTOR ═══════════════ -->
+<div class="pg" id="pg-tradutor">
+  <div class="ph"><h2>🗣️ Tradutor</h2><p>Inglês irlandês — frases prontas com áudio!</p></div>
+  <div class="tbox">
+    <h3>Traduzir frase</h3>
+    <select class="tlang" id="lang-sel" onchange="renderPhrases()">
+      <option value="en">🇬🇧 Inglês (para o dia a dia)</option>
+      <option value="es">🇪🇸 Espanhol (viagem)</option>
+      <option value="fr">🇫🇷 Francês (viagem)</option>
+      <option value="de">🇩🇪 Alemão (viagem)</option>
+      <option value="it">🇮🇹 Italiano (viagem)</option>
+    </select>
+    <div class="tarea">
+      <textarea class="tinp-t" id="trans-in" placeholder="Digite em português..."></textarea>
+      <div class="tout" id="trans-out">A tradução aparecerá aqui</div>
+    </div>
+    <button class="tbtn green" onclick="speakTrans()">🔊 Ouvir</button>
+    <button class="tbtn orange" onclick="doTranslate()">🔄 Traduzir</button>
+  </div>
+  <div class="tbox">
+    <h3>📋 Frases Prontas — <span id="lang-name">Inglês</span></h3>
+    <div id="phrases-box"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ DINHEIRO ═══════════════ -->
+<div class="pg" id="pg-dinheiro">
+  <div class="ph"><h2>💶 Dinheiro</h2><p>Acompanhe sua meta de comprovação</p></div>
+  <span class="livepill"><span class="ldot"></span> Cotação em tempo real</span>
+  <div class="rate-pill" id="rate-pill">🔄 Buscando cotação...</div>
+  <div class="two" style="margin-bottom:13px">
+    <div class="tw" style="padding:13px">
+      <h3 style="font-family:'Playfair Display',serif;font-size:.87rem;color:var(--g);margin-bottom:9px">💶 Tenho em Euro</h3>
+      <div class="minp-row"><span class="mc">€</span><input class="minp" type="number" id="m-euro" placeholder="0" oninput="calcMoney()" step="0.01"></div>
+      <div class="mconv" id="euro-conv">= R$ —</div>
+    </div>
+    <div class="tw" style="padding:13px">
+      <h3 style="font-family:'Playfair Display',serif;font-size:.87rem;color:var(--g);margin-bottom:9px">🇧🇷 Tenho em Real</h3>
+      <div class="minp-row"><span class="mc">R$</span><input class="minp" type="number" id="m-real" placeholder="0" oninput="calcMoney()" step="0.01"></div>
+      <div class="mconv" id="real-conv">= € —</div>
+    </div>
+  </div>
+  <div class="tw" style="padding:15px">
+    <h3 style="font-family:'Playfair Display',serif;font-size:.87rem;color:var(--g);margin-bottom:11px">🎯 Meta — Comprovação Financeira</h3>
+    <div class="mstat"><span class="msl">Meta exigida</span><span class="msv" id="m-meta">€6.665</span></div>
+    <div class="mstat"><span class="msl">Total que tenho</span><span class="msv" id="m-total">€0,00</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--gray);margin-top:8px"><span>€0</span><span id="m-pct" style="font-weight:600;color:var(--g)">0%</span><span id="m-goal-lbl">€6.665</span></div>
+    <div class="prog-bg"><div class="prog-bar" id="m-bar" style="width:0%"></div></div>
+    <div class="mstat" style="margin-top:7px"><span class="msl">Falta (Euro)</span><span class="msv bad" id="m-falta-eur">€6.665</span></div>
+    <div class="mstat"><span class="msl">Falta (Real)</span><span class="msv bad" id="m-falta-brl">R$ —</span></div>
+  </div>
+  <div class="tip">💳 Use Wise ou Revolut para receber em Euro sem pagar IOF!</div>
+  <div class="tip">💰 Trabalhando 20h/sem: ~€<span id="renda-20h">1.130</span>/mês · 40h/sem: ~€<span id="renda-40h">2.264</span>/mês</div>
+</div>
+
+<!-- ═══════════════ REGISTROS ═══════════════ -->
+<div class="pg" id="pg-registros">
+  <div class="ph"><h2>📸 Registros</h2><p>Suas memórias do intercâmbio!</p></div>
+  <div class="stitle">🍀 Álbum Geral</div>
+  <div class="regg" id="reg-main">
+    <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-main')"><span class="plus">➕</span><p>Adicionar fotos</p></div>
+  </div>
+  <div class="stitle">🎓 Na Escola</div>
+  <div class="regg" id="reg-escola">
+    <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-escola')"><span class="plus">➕</span><p>Adicionar fotos</p></div>
+  </div>
+  <div class="stitle">🌍 Viagens</div>
+  <div class="regg" id="reg-viagens">
+    <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-viagens')"><span class="plus">➕</span><p>Adicionar fotos</p></div>
+  </div>
+  <div class="stitle">👥 Amigos</div>
+  <div class="regg" id="reg-amigos">
+    <div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'reg-amigos')"><span class="plus">➕</span><p>Adicionar fotos</p></div>
+  </div>
+</div>
+
+<!-- ═══════════════ INFORMAÇÕES ═══════════════ -->
+<div class="pg" id="pg-info">
+  <div class="ph"><h2>ℹ️ Informações</h2><p>Tudo que você precisa saber!</p></div>
+  <div class="tabs" id="info-tabs">
+    <button class="tab on" onclick="openTab('fin')">💰 Financeiro</button>
+    <button class="tab" onclick="openTab('emp')">💼 Emprego</button>
+    <button class="tab" onclick="openTab('guia')">🗺️ Cork</button>
+    <button class="tab" onclick="openTab('dicas')">💡 Dicas</button>
+  </div>
+  <div class="panel on" id="p-fin">
+    <div class="alrt">⚠️ Comprovação para 8 meses: <b id="proof-val">€6.665</b> — deve estar em conta <b>bancária tradicional</b></div>
+    <div class="tw"><div class="tt">Comprovação por duração</div><table class="t"><thead><tr><th>Duração</th><th>Valor</th></tr></thead><tbody><tr><td>Até 90 dias</td><td>Não exigido</td></tr><tr><td>Até 8 meses ← seu caso!</td><td><b id="proof-val2">€6.665</b></td></tr><tr><td>Mais de 8 meses</td><td>€10.000</td></tr></tbody></table></div>
+    <div class="tw"><div class="tt">💸 Renda trabalhando (salário: <span id="wage-info">€14,15</span>/h)</div><table class="t"><thead><tr><th>Período</th><th>Horas/sem</th><th>Renda/mês</th></tr></thead><tbody><tr><td>Durante aulas</td><td>20h</td><td id="earn-20">~€1.130</td></tr><tr><td>Férias</td><td>40h</td><td id="earn-40">~€2.264</td></tr></tbody></table></div>
+  </div>
+  <div class="panel" id="p-emp">
+    <div class="tip">🎯 Com IRP + PPS Number você pode trabalhar 20h/sem durante as aulas!</div>
+    <div class="tip">💡 Brasileiros costumam conseguir emprego rapidamente em hospitality (cafés, pubs, restaurantes).</div>
+    <div class="tw"><div class="tt">Empregos mais comuns para estudantes</div><table class="t"><thead><tr><th>Área</th><th>Salário/hora</th><th>Dica</th></tr></thead><tbody><tr><td>Café / restaurante</td><td>€14,15–€16</td><td>Mais fácil de conseguir</td></tr><tr><td>Varejo</td><td>€14,15–€15</td><td>Lojas no centro</td></tr><tr><td>Limpeza</td><td>€14,15–€15</td><td>Hotéis e escritórios</td></tr><tr><td>Tecnologia</td><td>€16–€25</td><td>Com experiência</td></tr></tbody></table></div>
+    <div class="linkrow">
+      <a class="lnk" href="https://ie.indeed.com" target="_blank">🔍 Indeed</a>
+      <a class="lnk" href="https://www.irishjobs.ie" target="_blank">💼 IrishJobs</a>
+      <a class="lnk" href="https://www.linkedin.com/jobs" target="_blank">💼 LinkedIn</a>
+    </div>
+  </div>
+  <div class="panel" id="p-guia">
+    <div class="tw"><div class="tt">🛒 Supermercados em Cork</div><table class="t"><thead><tr><th>Supermercado</th><th>Tipo</th><th>Dica</th></tr></thead><tbody><tr><td>Lidl ⭐</td><td>Mais barato</td><td>Melhor custo-benefício</td></tr><tr><td>Aldi ⭐</td><td>Mais barato</td><td>Produtos alemães + desconto</td></tr><tr><td>Tesco</td><td>Completo</td><td>Club Card para descontos</td></tr><tr><td>Dunnes Stores</td><td>Completo</td><td>Bom para roupas também</td></tr><tr><td>Penneys (Primark)</td><td>Roupas</td><td>Preços imbatíveis</td></tr></tbody></table></div>
+    <div class="tw"><div class="tt">🚌 Transporte em Cork</div><table class="t"><thead><tr><th>Meio</th><th>Custo</th></tr></thead><tbody><tr><td>Ônibus (Leapcard)</td><td>€1,55/viagem</td></tr><tr><td>Ônibus (sem cartão)</td><td>€2,40</td></tr><tr><td>Student Leap Card</td><td>Desconto 20%</td></tr><tr><td>Bicicleta</td><td>Recomendado!</td></tr></tbody></table></div>
+  </div>
+  <div class="panel" id="p-dicas">
+    <div class="tip">🗣️ Force-se a falar inglês sempre — sua fluência cresce muito mais rápido com prática real!</div>
+    <div class="warn">⚠️ Cuidado para não ficar só com brasileiros. Busque amizades com irlandeses e outras nacionalidades!</div>
+    <div class="tip">🌧️ O clima é imprevisível — sempre carregue uma jaqueta impermeável, mesmo no verão!</div>
+    <div class="tip">🍺 O pub é o coração social da Irlanda. Você não precisa beber álcool — vá pela experiência cultural!</div>
+    <div class="tw"><div class="tt">📱 Apps Essenciais em Cork</div><table class="t"><thead><tr><th>App</th><th>Para quê</th></tr></thead><tbody><tr><td>Revolut / Wise</td><td>Câmbio sem taxa IOF</td></tr><tr><td>Daft.ie</td><td>Alugar quarto</td></tr><tr><td>Too Good To Go</td><td>Comida por ~€3,99</td></tr><tr><td>Bus Éireann</td><td>Ônibus Cork</td></tr><tr><td>Irish Rail</td><td>Trens Irlanda</td></tr><tr><td>Deliveroo / Just Eat</td><td>Delivery (work)</td></tr></tbody></table></div>
+  </div>
+</div>
+
+</div><!-- /scroll -->
+</div><!-- /layout -->
+
+<!-- BOTTOM NAV (mobile) -->
+<div class="bnav">
+  <div class="bnitems">
+    <button class="bni on" onclick="goTo('home')"><span class="bi">🏠</span><span class="bl">Início</span></button>
+    <button class="bni" onclick="goTo('timeline')"><span class="bi">📅</span><span class="bl">Agenda</span></button>
+    <button class="bni" onclick="goTo('checklist')"><span class="bi">✅</span><span class="bl">Check</span></button>
+    <button class="bni" onclick="goTo('cork')"><span class="bi">📍</span><span class="bl">Cork</span></button>
+    <button class="bni" onclick="goTo('europa')"><span class="bi">🌍</span><span class="bl">Europa</span></button>
+    <button class="bni" onclick="goTo('dinheiro')"><span class="bi">💶</span><span class="bl">€</span></button>
+    <button class="bni" onclick="goTo('registros')"><span class="bi">📸</span><span class="bl">Fotos</span></button>
+    <button class="bni" onclick="goTo('tradutor')"><span class="bi">🗣️</span><span class="bl">Traduzir</span></button>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="closeLB()"><button class="lb-x">✕</button><img id="lb-img" src="" alt=""></div>
+
+<!-- Google Maps API -->
+
+<script>
+// ─────────────────────────────────────────────
+// SUPABASE — Configuração e camada de dados
+// ─────────────────────────────────────────────
+const SB_URL = 'https://ltlumhcmavnnrsfqwlhm.supabase.co';
+const SB_KEY = 'sb_publishable_CzYaydbkbTIni6Efp6KSwQ_qJu5SvEn';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+// Toast de sync
+function showSyncToast(msg, type='info') {
+  let t = document.getElementById('sync-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'sync-toast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a5c2e;color:#fff;padding:7px 16px;border-radius:20px;font-size:.75rem;font-family:"DM Sans",sans-serif;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.2)';
+    document.body.appendChild(t);
+  }
+  if (type === 'error') t.style.background = '#c0392b';
+  else if (type === 'ok') t.style.background = '#1a5c2e';
+  else t.style.background = '#444';
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._to);
+  t._to = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+// ── Abstração DB: upsert / get / delete ──
+
+async function dbGet(table, match) {
+  try {
+    let q = sb.from(table).select('*');
+    if (match) Object.entries(match).forEach(([k,v]) => { q = q.eq(k,v); });
+    const { data, error } = await q;
+    if (error) throw error;
+    return data;
+  } catch(e) {
+    console.warn('dbGet error', table, e.message);
+    return null;
+  }
+}
+
+async function dbUpsert(table, row) {
+  try {
+    const { error } = await sb.from(table).upsert(row, { onConflict: 'id' });
+    if (error) throw error;
+    return true;
+  } catch(e) {
+    console.warn('dbUpsert error', table, e.message);
+    return false;
+  }
+}
+
+async function dbInsert(table, row) {
+  try {
+    const { data, error } = await sb.from(table).insert(row).select().single();
+    if (error) throw error;
+    return data;
+  } catch(e) {
+    console.warn('dbInsert error', table, e.message);
+    return null;
+  }
+}
+
+async function dbDelete(table, match) {
+  try {
+    let q = sb.from(table).delete();
+    Object.entries(match).forEach(([k,v]) => { q = q.eq(k,v); });
+    const { error } = await q;
+    if (error) throw error;
+    return true;
+  } catch(e) {
+    console.warn('dbDelete error', table, e.message);
+    return false;
+  }
+}
+
+// ── Status de conexão ──
+let isOnline = navigator.onLine;
+window.addEventListener('online',  () => { isOnline = true;  showSyncToast('☁️ Online — dados sincronizados', 'ok'); });
+window.addEventListener('offline', () => { isOnline = false; showSyncToast('📵 Offline — usando cache local', 'error'); });
+
+// ── Pull-to-refresh ──
+(function(){
+  let startY = 0, pulling = false;
+  const scroll = document.getElementById('main-scroll');
+  if (!scroll) return;
+  scroll.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+  scroll.addEventListener('touchmove', e => {
+    if (scroll.scrollTop === 0 && e.touches[0].clientY - startY > 60) pulling = true;
+  }, { passive: true });
+  scroll.addEventListener('touchend', () => {
+    if (pulling) { pulling = false; showSyncToast('🔄 Atualizando...'); setTimeout(() => location.reload(), 400); }
+  });
+})();
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+function goTo(page) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  const el = document.getElementById('pg-' + page);
+  if (el) el.classList.add('on');
+  document.querySelectorAll('.ni, .bni').forEach(n => n.classList.remove('on'));
+  document.querySelectorAll('.ni, .bni').forEach(n => {
+    if ((n.getAttribute('onclick') || '').includes("'" + page + "'")) n.classList.add('on');
+  });
+  document.getElementById('main-scroll').scrollTo(0, 0);
+}
+
+// ─────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────
+function openTab(t) {
+  goTo('info');
+  document.querySelectorAll('#info-tabs .tab').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('#info-tabs .tab').forEach(b => {
+    if ((b.getAttribute('onclick') || '').includes("'" + t + "'")) b.classList.add('on');
+  });
+  document.querySelectorAll('#pg-info .panel').forEach(p => p.classList.remove('on'));
+  const p = document.getElementById('p-' + t);
+  if (p) p.classList.add('on');
+}
+
+function openAcTab(t) {
+  document.querySelectorAll('.pg.on .tab').forEach(b => {
+    b.classList.toggle('on', (b.getAttribute('onclick') || '').includes("'" + t + "'"));
+  });
+  ['inicial', 'fixa'].forEach(id => {
+    const p = document.getElementById('ac-panel-' + id);
+    if (p) p.classList.toggle('on', id === t);
+  });
+}
+
+// ─────────────────────────────────────────────
+// COUNTDOWN
+// ─────────────────────────────────────────────
+function updateCountdown() {
+  const embarque = new Date('2026-09-22T00:00:00');
+  const aulas    = new Date('2026-09-28T00:00:00');
+  const retorno  = new Date(aulas.getTime() + 33 * 7 * 86400000);
+  const now = new Date();
+  const days = Math.max(0, Math.floor((embarque - now) / 86400000));
+  const el = document.getElementById('home-days');
+  if (el) el.textContent = days.toLocaleString('pt-BR');
+  const rel = document.getElementById('home-ret');
+  if (rel) rel.textContent = retorno.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// ─────────────────────────────────────────────
+// LIVE DATA via Anthropic API
+// ─────────────────────────────────────────────
+let euroRate = 6.2, liveWage = 14.15, liveProof = 6665;
+
+async function fetchLiveData(showSpinner) {
+  if (showSpinner) {
+    const ic = document.getElementById('sync-ico');
+    if (ic) { ic.textContent = '🔄'; ic.style.animation = 'spin .8s linear infinite'; }
+    const ptr = document.getElementById('ptr-bar');
+    if (ptr) { ptr.classList.add('show'); }
+  }
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{
+          role: 'user',
+          content: 'Search: 1) Ireland minimum wage per hour 2026 2) EUR to BRL exchange rate today. Reply ONLY valid JSON no markdown: {"wage":14.15,"proof":6665,"eur":6.20}'
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content || []).filter(c => c.type === 'text').map(c => c.text).join('');
+    const m = text.match(/\{[^}]+\}/);
+    if (m) {
+      try {
+        const j = JSON.parse(m[0]);
+        if (j.wage > 10) liveWage = j.wage;
+        if (j.proof > 1000) liveProof = j.proof;
+        if (j.eur > 3) euroRate = j.eur;
+      } catch(e) {}
+    }
+  } catch(e) {}
+  applyLiveData();
+  if (showSpinner) {
+    const ic = document.getElementById('sync-ico');
+    if (ic) { ic.textContent = '🔄'; ic.style.animation = ''; }
+    const ptr = document.getElementById('ptr-bar');
+    if (ptr) { setTimeout(() => ptr.classList.remove('show'), 1200); }
+  }
+}
+
+function applyLiveData() {
+  const w = liveWage.toFixed(2).replace('.', ',');
+  ['hw-stat'].forEach(id => { const e = document.getElementById(id); if (e) e.textContent = '€' + w; });
+  ['hp-stat', 'm-meta', 'm-goal-lbl', 'proof-val', 'proof-val2'].forEach(id => {
+    const e = document.getElementById(id);
+    if (e) e.textContent = '€' + liveProof.toLocaleString('pt-BR');
+  });
+  const e20 = Math.round(liveWage * 20 * 4.33);
+  const e40 = Math.round(liveWage * 40 * 4.33);
+  ['renda-20h', 'earn-20'].forEach(id => { const e = document.getElementById(id); if (e) e.textContent = e20 % 1 === 0 ? e20 : e20.toFixed(0); });
+  ['renda-40h', 'earn-40'].forEach(id => { const e = document.getElementById(id); if (e) e.textContent = e40 % 1 === 0 ? e40 : e40.toFixed(0); });
+  const wi = document.getElementById('wage-info'); if (wi) wi.textContent = '€' + w;
+  const rp = document.getElementById('rate-pill');
+  if (rp) rp.textContent = '💱 €1 = R$ ' + euroRate.toFixed(2).replace('.', ',') + '  ·  cotação ao vivo';
+  calcMoney();
+  const sf = document.getElementById('sf-time');
+  if (sf) sf.textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  try { localStorage.setItem('liveData', JSON.stringify({ wage: liveWage, proof: liveProof, eur: euroRate, ts: Date.now() })); } catch(e) {}
+}
+
+// Load cached data first, then fetch
+(function() {
+  try {
+    const c = JSON.parse(localStorage.getItem('liveData') || 'null');
+    if (c && Date.now() - c.ts < 86400000) {
+      liveWage = c.wage || 14.15; liveProof = c.proof || 6665; euroRate = c.eur || 6.2;
+    }
+  } catch(e) {}
+  applyLiveData();
+  fetchLiveData(false);
+})();
+
+function syncAll() { fetchLiveData(true); }
+
+// ─────────────────────────────────────────────
+// PULL TO REFRESH
+// ─────────────────────────────────────────────
+(function() {
+  let startY = 0, pulling = false;
+  const scroll = document.getElementById('main-scroll');
+  scroll.addEventListener('touchstart', e => { if (scroll.scrollTop === 0) { startY = e.touches[0].clientY; pulling = true; } }, { passive: true });
+  scroll.addEventListener('touchmove', e => {
+    if (!pulling) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 60) {
+      const ptr = document.getElementById('ptr-bar');
+      if (ptr) ptr.classList.add('show');
+    }
+  }, { passive: true });
+  scroll.addEventListener('touchend', e => {
+    if (!pulling) return;
+    pulling = false;
+    const ptr = document.getElementById('ptr-bar');
+    if (ptr && ptr.classList.contains('show')) {
+      fetchLiveData(false);
+      setTimeout(() => ptr.classList.remove('show'), 1500);
+    }
+  });
+})();
+
+// ─────────────────────────────────────────────
+// MONEY
+// ─────────────────────────────────────────────
+function calcMoney() {
+  const euros = parseFloat(document.getElementById('m-euro')?.value) || 0;
+  const reais = parseFloat(document.getElementById('m-real')?.value) || 0;
+  const totalE = euros + reais / euroRate;
+  const ec = document.getElementById('euro-conv');
+  if (ec) ec.textContent = euros ? '= R$ ' + (euros * euroRate).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '= R$ —';
+  const rc = document.getElementById('real-conv');
+  if (rc) rc.textContent = reais ? '= € ' + (reais / euroRate).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '= € —';
+  const pct = Math.min(100, Math.round(totalE / liveProof * 100));
+  const faltaE = Math.max(0, liveProof - totalE);
+  const bar = document.getElementById('m-bar'); if (bar) bar.style.width = pct + '%';
+  const pctEl = document.getElementById('m-pct'); if (pctEl) pctEl.textContent = pct + '%';
+  const te = document.getElementById('m-total'); if (te) te.textContent = '€ ' + totalE.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fe = document.getElementById('m-falta-eur'); if (fe) { fe.textContent = '€ ' + faltaE.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); fe.className = 'msv ' + (faltaE <= 0 ? 'good' : 'bad'); }
+  const fb = document.getElementById('m-falta-brl'); if (fb) { fb.textContent = 'R$ ' + (faltaE * euroRate).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); fb.className = 'msv ' + (faltaE <= 0 ? 'good' : 'bad'); }
+  clearTimeout(window._moneyTimer);
+  window._moneyTimer = setTimeout(async () => {
+    const ve = document.getElementById('m-euro')?.value, vr = document.getElementById('m-real')?.value;
+    try { localStorage.setItem('m_e', ve); localStorage.setItem('m_r', vr); } catch(e) {}
+    await dbUpsert('cork_dinheiro', { id: 'm_e', value: ve, updated_at: new Date().toISOString() });
+    await dbUpsert('cork_dinheiro', { id: 'm_r', value: vr, updated_at: new Date().toISOString() });
+  }, 1000);
+}
+(async function() {
+  const rows = await dbGet('cork_dinheiro');
+  if (rows && rows.length) {
+    rows.forEach(r => {
+      if (r.id === 'm_e') { const el = document.getElementById('m-euro'); if (el) el.value = r.value; }
+      if (r.id === 'm_r') { const el = document.getElementById('m-real'); if (el) el.value = r.value; }
+    });
+  } else {
+    try { const me = localStorage.getItem('m_e'), mr = localStorage.getItem('m_r'); if (me) document.getElementById('m-euro').value = me; if (mr) document.getElementById('m-real').value = mr; } catch(e) {}
+  }
+  calcMoney();
+})();
+
+// ─────────────────────────────────────────────
+// CHECKLIST
+// ─────────────────────────────────────────────
+async function ck(item) {
+  item.classList.toggle('on');
+  const states = [...document.querySelectorAll('.cki')].map((el,i) => ({ id: 'ck_'+i, checked: el.classList.contains('on'), updated_at: new Date().toISOString() }));
+  // local cache
+  try { localStorage.setItem('ck_v6', JSON.stringify(states.map(s=>s.checked))); } catch(e) {}
+  // cloud
+  for (const s of states) await dbUpsert('cork_checklist', s);
+}
+(async function() {
+  // try cloud first
+  const rows = await dbGet('cork_checklist');
+  if (rows && rows.length) {
+    const items = document.querySelectorAll('.cki');
+    rows.forEach(r => {
+      const idx = parseInt(r.id.replace('ck_',''));
+      if (!isNaN(idx) && items[idx] && r.checked) items[idx].classList.add('on');
+    });
+  } else {
+    // fallback local
+    try { const s = JSON.parse(localStorage.getItem('ck_v6') || '[]'); document.querySelectorAll('.cki').forEach((el,i) => { if (s[i]) el.classList.add('on'); }); } catch(e) {}
+  }
+})();
+
+// ─────────────────────────────────────────────
+// DOCUMENTS
+// ─────────────────────────────────────────────
+const DS = {};
+async function buildDocSlots(containerId, slots) {
+  const c = document.getElementById(containerId); if (!c) return;
+  c.innerHTML = slots.map(s => `
+    <div class="dslot" id="ds-${s.id}">
+      <div class="dhead"><input type="file" multiple onchange="addDocFile(this,'${s.id}')">
+        <div class="dico">${s.ico}</div><h4>${s.name}</h4><p>${s.desc}</p>
+      </div>
+      <div class="dfiles" id="dfl-${s.id}"></div>
+    </div>`).join('');
+  // Load from cloud
+  const rows = await dbGet('cork_docs');
+  if (rows && rows.length) {
+    rows.forEach(r => {
+      if (!DS[r.slot_id]) DS[r.slot_id] = [];
+      DS[r.slot_id].push({ id: r.id, name: r.name, data: r.data, type: r.type });
+    });
+    slots.forEach(s => renderDocSlot(s.id));
+  } else {
+    slots.forEach(s => {
+      try { const saved = JSON.parse(localStorage.getItem('docs_' + s.id) || 'null'); if (saved) { DS[s.id] = saved.map(f => ({ ...f, id: f.id || (Date.now()+Math.random()).toString() })); renderDocSlot(s.id); } } catch(e) {}
+    });
+  }
+}
+function addDocFile(input, id) {
+  if (!DS[id]) DS[id] = [];
+  Array.from(input.files).forEach(file => {
+    const r = new FileReader();
+    r.onload = async e => {
+      const row = { slot_id: id, name: file.name, type: file.type, data: e.target.result };
+      const saved = await dbInsert('cork_docs', row);
+      DS[id].push({ id: saved?.id || Date.now().toString(), ...row });
+      renderDocSlot(id);
+      showSyncToast('☁️ Documento salvo na nuvem!', 'ok');
+    };
+    r.readAsDataURL(file);
+  });
+  input.value = '';
+}
+function renderDocSlot(id) {
+  const slot = document.getElementById('ds-' + id); if (!slot) return;
+  const files = DS[id] || [];
+  slot.classList.toggle('has', files.length > 0);
+  const list = document.getElementById('dfl-' + id); if (!list) return;
+  list.innerHTML = files.map((f, i) => `<div class="dfile"><span class="dfname" onclick="openDoc('${id}',${i})" title="${f.name}">📄 ${f.name}</span><button class="dfdel" onclick="delDoc('${id}','${f.id}',${i})">🗑️</button></div>`).join('');
+}
+function openDoc(id, i) {
+  const f = DS[id] && DS[id][i]; if (!f) return;
+  if (f.type.startsWith('image/')) { openLB(f.data); } else { const w = window.open(); w.document.write(`<iframe src="${f.data}" style="width:100%;height:100vh;border:none"></iframe>`); }
+}
+async function delDoc(id, rowId, i) {
+  await dbDelete('cork_docs', { id: rowId });
+  if (!DS[id]) return; DS[id].splice(i, 1); renderDocSlot(id);
+}
+
+const VOO_DOCS = [
+  { id: 'passagem', ico: '✈️', name: 'Passagem Aérea', desc: 'GRU→MAD→DUB' },
+  { id: 'passaporte', ico: '🛂', name: 'Passaporte', desc: 'Páginas de dados' },
+  { id: 'seguro', ico: '🏥', name: 'Seguro Viagem', desc: 'Apólice' },
+  { id: 'voo-outros', ico: '📁', name: 'Outros', desc: 'Outros docs de viagem' },
+];
+const MAIN_DOCS = [
+  { id: 'matricula', ico: '🎓', name: 'Carta Matrícula', desc: 'SEDA — obrigatório' },
+  { id: 'calendario', ico: '📅', name: 'Calendário SEDA', desc: '2026' },
+  { id: 'passo', ico: '📋', name: 'Passo a Passo', desc: 'Guia da escola' },
+  { id: 'extrato', ico: '💳', name: 'Extrato Bancário', desc: 'Comprovação €' },
+  { id: 'irp', ico: '🪪', name: 'IRP', desc: 'Residence Permit' },
+  { id: 'pps', ico: '📋', name: 'PPS Number', desc: 'CPF irlandês' },
+  { id: 'foto3x4', ico: '📷', name: 'Foto 3x4', desc: 'Para documentos' },
+  { id: 'curriculo', ico: '📄', name: 'Currículo EN', desc: 'CV em inglês' },
+  { id: 'leap', ico: '🚌', name: 'Student Leap Card', desc: 'Transporte' },
+  { id: 'outros-docs', ico: '📁', name: 'Outros', desc: 'Vacinas, extras...' },
+];
+const AC_DOCS_I = [
+  { id: 'ac-i-res', ico: '🏨', name: 'Reserva', desc: 'Confirmação' },
+  { id: 'ac-i-contrato', ico: '📄', name: 'Contrato', desc: 'Se houver' },
+  { id: 'ac-i-outros', ico: '📁', name: 'Outros', desc: '' },
+];
+const AC_DOCS_F = [
+  { id: 'ac-f-contrato', ico: '📄', name: 'Contrato', desc: 'Lease agreement' },
+  { id: 'ac-f-res', ico: '🏨', name: 'Comprovante', desc: 'Confirmação endereço' },
+  { id: 'ac-f-outros', ico: '📁', name: 'Outros', desc: '' },
+];
+
+buildDocSlots('voo-docs', VOO_DOCS);
+buildDocSlots('docs-main', MAIN_DOCS);
+buildDocSlots('ac-docs-inicial', AC_DOCS_I);
+buildDocSlots('ac-docs-fixa', AC_DOCS_F);
+
+// ─────────────────────────────────────────────
+// NOTES + ATTACHMENTS
+// ─────────────────────────────────────────────
+const NT = {}, NTmr = {};
+function autoSave(id) {
+  clearTimeout(NTmr[id]);
+  NTmr[id] = setTimeout(async () => {
+    const val = document.getElementById(id)?.value || '';
+    try { localStorage.setItem('note_' + id, val); } catch(e) {}
+    await dbUpsert('cork_notas', { id, content: val, updated_at: new Date().toISOString() });
+    const el = document.getElementById('ns-' + id); if (el) { el.textContent = '☁️ Salvo'; setTimeout(() => { if (el) el.textContent = ''; }, 2000); }
+  }, 700);
+}
+function noteAtt(input, cid) {
+  if (!NT[cid]) NT[cid] = [];
+  Array.from(input.files).forEach(file => {
+    const r = new FileReader();
+    r.onload = async e => {
+      const row = { nota_id: cid, name: file.name, type: file.type, data: e.target.result };
+      const saved = await dbInsert('cork_nota_atts', row);
+      NT[cid].push({ id: saved?.id || Date.now().toString(), ...row });
+      renderNoteAtts(cid);
+    };
+    r.readAsDataURL(file);
+  }); input.value = '';
+}
+function renderNoteAtts(cid) {
+  const c = document.getElementById(cid); if (!c) return;
+  c.innerHTML = (NT[cid] || []).map((a, i) => `<div class="natt"><span class="natt-n" onclick="openNAtt('${cid}',${i})">${a.type.startsWith('image/') ? '🖼️' : '📄'} ${a.name}</span><button class="natt-d" onclick="delNAtt('${cid}','${a.id}',${i})">✕</button></div>`).join('');
+}
+function openNAtt(cid, i) { const a = NT[cid] && NT[cid][i]; if (!a) return; if (a.type.startsWith('image/')) { openLB(a.data); } else { const w = window.open(); w.document.write(`<iframe src="${a.data}" style="width:100%;height:100vh;border:none"></iframe>`); } }
+async function delNAtt(cid, rowId, i) {
+  await dbDelete('cork_nota_atts', { id: rowId });
+  if (!NT[cid]) return; NT[cid].splice(i, 1); renderNoteAtts(cid);
+}
+
+(async function() {
+  // Load notes text
+  const noteRows = await dbGet('cork_notas');
+  if (noteRows && noteRows.length) {
+    noteRows.forEach(r => { const el = document.getElementById(r.id); if (el) el.value = r.content; });
+  } else {
+    ['n-geral','n-emp','n-ac','n-viag','n-fin','n-dicas'].forEach(id => { try { const v = localStorage.getItem('note_' + id); if (v) { const el = document.getElementById(id); if (el) el.value = v; } } catch(e) {} });
+  }
+  // Load note attachments
+  const attRows = await dbGet('cork_nota_atts');
+  if (attRows && attRows.length) {
+    attRows.forEach(r => {
+      const cid = 'na-' + r.nota_id.replace('n-','');
+      if (!NT[cid]) NT[cid] = [];
+      NT[cid].push({ id: r.id, name: r.name, type: r.type, data: r.data });
+    });
+    Object.keys(NT).forEach(k => renderNoteAtts(k));
+  }
+})();
+
+// ─────────────────────────────────────────────
+// ACOMODAÇÃO
+// ─────────────────────────────────────────────
+const AC_FIELDS = { inicial: ['nome','end','cin','cout','preco','obs'], fixa: ['nome','end','preco','contato','obs'] };
+async function saveAc(type) {
+  const data = {};
+  AC_FIELDS[type].forEach(f => { const el = document.getElementById('ac-' + type[0] + '-' + f); data[f] = el ? el.value : ''; });
+  const rows = Object.entries(data).map(([k,v]) => ({ id: 'ac_'+type+'_'+k, value: v, updated_at: new Date().toISOString() }));
+  for (const r of rows) await dbUpsert('cork_acomodacao', r);
+  try { localStorage.setItem('ac_' + type, JSON.stringify(data)); } catch(e) {}
+  const s = document.getElementById('ac-saved-' + type); if (s) { s.textContent = '☁️ Salvo!'; setTimeout(() => s.textContent = '', 2000); }
+}
+(async function() {
+  const rows = await dbGet('cork_acomodacao');
+  if (rows && rows.length) {
+    rows.forEach(r => {
+      const parts = r.id.split('_'); // ac_inicial_nome
+      if (parts.length === 3) {
+        const type = parts[1], field = parts[2];
+        const el = document.getElementById('ac-' + type[0] + '-' + field);
+        if (el) el.value = r.value || '';
+      }
+    });
+  } else {
+    ['inicial','fixa'].forEach(type => {
+      try {
+        const d = JSON.parse(localStorage.getItem('ac_' + type) || 'null');
+        if (d) AC_FIELDS[type].forEach(f => { const el = document.getElementById('ac-' + type[0] + '-' + f); if (el && d[f]) el.value = d[f]; });
+      } catch(e) {}
+    });
+  }
+})();
+
+// ─────────────────────────────────────────────
+// PHOTOS / REGISTROS
+// ─────────────────────────────────────────────
+const PHOTOS = {};
+function addPhoto(input, galleryId) {
+  if (!PHOTOS[galleryId]) PHOTOS[galleryId] = [];
+  Array.from(input.files).forEach(file => {
+    const r = new FileReader();
+    r.onload = async e => {
+      const row = { album: galleryId, name: file.name, data: e.target.result };
+      const saved = await dbInsert('cork_fotos', row);
+      PHOTOS[galleryId].push({ id: saved?.id || Date.now().toString(), ...row });
+      renderGallery(galleryId);
+      showSyncToast('📸 Foto salva na nuvem!', 'ok');
+    };
+    r.readAsDataURL(file);
+  }); input.value = '';
+}
+function renderGallery(id) {
+  const g = document.getElementById(id); if (!g) return;
+  g.innerHTML = (PHOTOS[id] || []).map((p, i) => `<div class="regitem"><img src="${p.data||p}" onclick="openLB('${p.data||p}')"><button class="regdel" onclick="delPhoto('${id}','${p.id||i}',${i})">✕</button></div>`).join('') +
+    `<div class="regadd"><input type="file" multiple accept="image/*" onchange="addPhoto(this,'${id}')"><span class="plus">➕</span><p>Adicionar</p></div>`;
+}
+async function delPhoto(id, rowId, i) {
+  if (!isNaN(rowId)) { PHOTOS[id].splice(i, 1); renderGallery(id); return; }
+  await dbDelete('cork_fotos', { id: rowId });
+  PHOTOS[id].splice(i, 1); renderGallery(id);
+}
+
+(async function() {
+  const rows = await dbGet('cork_fotos');
+  if (rows && rows.length) {
+    rows.forEach(r => {
+      if (!PHOTOS[r.album]) PHOTOS[r.album] = [];
+      PHOTOS[r.album].push({ id: r.id, data: r.data, name: r.name, album: r.album });
+    });
+    ['reg-main','reg-escola','reg-viagens','reg-amigos','ac-photos-inicial','ac-photos-fixa'].forEach(id => renderGallery(id));
+  } else {
+    ['reg-main','reg-escola','reg-viagens','reg-amigos','ac-photos-inicial','ac-photos-fixa'].forEach(id => {
+      try { const s = JSON.parse(localStorage.getItem('ph_' + id) || 'null'); if (s) { PHOTOS[id] = s.map((d,i) => ({ id: 'local_'+i, data: d })); renderGallery(id); } } catch(e) {}
+    });
+  }
+})();
+
+// ─────────────────────────────────────────────
+// LIGHTBOX
+// ─────────────────────────────────────────────
+function openLB(src) { document.getElementById('lb-img').src = src; document.getElementById('lb').classList.add('op'); }
+function closeLB() { document.getElementById('lb').classList.remove('op'); }
+
+// ─────────────────────────────────────────────
+// VOOS
+// ─────────────────────────────────────────────
+const VOOS = [
+  { id: 0, from: 'GRU', to: 'DUB', date: '22/09/2026', label: 'Guarulhos → Dublin', info: 'Voo de ida — embarque em Guarulhos', mode: '✈️', companhia: 'A confirmar' },
+  { id: 1, from: 'DUB', to: 'CORK', date: '23/09/2026', label: 'Dublin → Cork', info: '🚌 Ônibus Bus Éireann (~3h, ~€14) — saída de Busáras (Dublin Central Bus Station)', mode: '🚌', companhia: 'Bus Éireann' },
+  { id: 2, from: '?', to: 'GRU', date: 'A definir', label: 'Volta para o Brasil', info: '✏️ Defina a cidade de partida quando souber — chegada em Guarulhos', mode: '✈️', companhia: 'A confirmar', editDate: true },
+];
+let voosSaved = {}, voosReturn = {};
+
+async function buildVoos() {
+  const c = document.getElementById('voos-list'); if (!c) return;
+  // Load from cloud
+  const rows = await dbGet('cork_voos');
+  if (rows && rows.length) {
+    rows.forEach(r => {
+      if (r.id === 'voo_return') { try { voosReturn = JSON.parse(r.value); } catch(e) {} }
+      else voosSaved[r.id.replace('voo_','')] = r.value;
+    });
+  } else {
+    try { voosSaved = JSON.parse(localStorage.getItem('voos_loc') || '{}'); } catch(e) {}
+    try { voosReturn = JSON.parse(localStorage.getItem('voo_return') || '{}'); } catch(e) {}
+  }
+  c.innerHTML = VOOS.map((v, i) => {
+    const loc = voosSaved[i] || '';
+    const isReturn = v.editDate;
+    const retFrom = voosReturn.from || '';
+    const retDate = voosReturn.date || '';
+    const retCompanhia = voosReturn.companhia || '';
+    const fromDisplay = isReturn ? (retFrom || '?') : v.from;
+    const dateDisplay = isReturn ? (retDate || 'A definir') : v.date;
+    const compDisplay = isReturn ? (retCompanhia || 'A confirmar') : v.companhia;
+    return `<div class="fcard" ${isReturn ? 'style="border-left:4px solid var(--gold);background:linear-gradient(135deg,#fef9ec,#fff)"' : ''}>
+      <div class="froute">
+        <span class="fcode">${fromDisplay}</span>
+        <span class="farrow"> ${v.mode}→ </span>
+        <span class="fcode">${v.to}</span>
+        <span class="fbadge ${loc ? 'ok' : 'pend'}" style="margin-left:auto">${loc ? '✅ Confirmado' : isReturn ? '⏳ A definir' : '⏳ Pendente'}</span>
+      </div>
+      <div class="finfo">📅 ${dateDisplay} · ${compDisplay}</div>
+      <div class="finfo" style="color:var(--dark)">${v.info}</div>
+      ${loc ? `<div style="font-size:.75rem;color:var(--g);margin-bottom:4px">📋 Localizador: <b>${loc}</b></div>` : ''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+        <button class="fedit-btn" onclick="toggleVooEdit(${i})">✏️ ${isReturn ? 'Preencher voo de volta' : (loc ? 'Editar localizador' : 'Adicionar localizador')}</button>
+        <div id="vedit-${i}" style="display:none;flex-direction:column;gap:6px;width:100%">
+          ${isReturn ? `
+          <div class="fedit-row" style="flex-wrap:wrap;gap:6px">
+            <input class="fedit-inp" id="vret-from" value="${retFrom}" placeholder="Cidade de partida (ex: EDI, DUB, LHR...)" style="flex:2;min-width:130px">
+            <input class="fedit-inp" id="vret-date" value="${retDate}" placeholder="Data (ex: 15/05/2027)" style="flex:1;min-width:100px">
+            <input class="fedit-inp" id="vret-comp" value="${retCompanhia}" placeholder="Companhia aérea" style="flex:1;min-width:100px">
+          </div>
+          <div class="fedit-row">
+            <input class="fedit-inp" id="vloc-${i}" value="${loc}" placeholder="Localizador (ex: ABC123)">
+            <button class="fsave" onclick="saveVooReturn(${i})">Salvar</button>
+          </div>` : `
+          <div class="fedit-row">
+            <input class="fedit-inp" id="vloc-${i}" value="${loc}" placeholder="Localizador (ex: ABC123)">
+            <button class="fsave" onclick="saveVoo(${i})">Salvar</button>
+          </div>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleVooEdit(i) {
+  const el = document.getElementById('vedit-' + i);
+  if (el) el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+}
+async function saveVoo(i) {
+  const val = document.getElementById('vloc-' + i)?.value.trim();
+  voosSaved[i] = val;
+  await dbUpsert('cork_voos', { id: 'voo_'+i, value: val, updated_at: new Date().toISOString() });
+  showSyncToast('☁️ Localizador salvo!', 'ok');
+  buildVoos();
+}
+async function saveVooReturn(i) {
+  const from = document.getElementById('vret-from')?.value.trim();
+  const date = document.getElementById('vret-date')?.value.trim();
+  const comp = document.getElementById('vret-comp')?.value.trim();
+  const loc  = document.getElementById('vloc-' + i)?.value.trim();
+  voosReturn = { from, date, companhia: comp };
+  voosSaved[i] = loc;
+  await dbUpsert('cork_voos', { id: 'voo_return', value: JSON.stringify(voosReturn), updated_at: new Date().toISOString() });
+  await dbUpsert('cork_voos', { id: 'voo_'+i, value: loc, updated_at: new Date().toISOString() });
+  showSyncToast('☁️ Voo de volta salvo!', 'ok');
+  buildVoos();
+}
+buildVoos();
+
+// ─────────────────────────────────────────────
+// TIMELINE
+// ─────────────────────────────────────────────
+const TL = [
+  { date: '✅ Concluído', title: 'Passagem de ida comprada', desc: 'GRU→DUB, 22/09/2026', fixed: true },
+  { date: 'Próximos meses', title: 'Fechar acomodação inicial (2 semanas) com SEDA', desc: 'Ainda do Brasil. Obrigatório para imigração.' },
+  { date: 'Antes de embarcar', title: 'Retirar novo passaporte', desc: 'Validade mínima até Nov/2027.' },
+  { date: 'Antes de embarcar', title: 'Organizar comprovação financeira', desc: 'Valor em conta bancária tradicional.' },
+  { date: 'Antes de embarcar', title: 'Contratar seguro saúde (min. €30.000)', desc: 'Obrigatório para visto.' },
+  { date: 'Antes de embarcar', title: 'Abrir conta Wise/Revolut', desc: 'Para receber em Euro sem IOF.' },
+  { date: '🛫 22/09/2026', title: 'EMBARQUE! GRU → MAD → DUB', desc: 'Escala 10h em Madri. Boa viagem!' },
+  { date: '23/09/2026', title: 'Ônibus Dublin → Cork', desc: 'Bus Éireann, ~3h, ~€14.' },
+  { date: 'Semana 1', title: 'Comprar chip Three Irlanda + Student Leap Card', desc: 'Comunicação e transporte baratos.' },
+  { date: 'Semana 1–2', title: 'Solicitar IRP + PPS Number', desc: 'Necessário para trabalhar legalmente.' },
+  { date: '📚 28/09/2026', title: 'Início das aulas na SEDA College', desc: 'Primeiro dia! Conheça pessoas de todo o mundo.' },
+  { date: 'Mês 2–3', title: 'Buscar acomodação fixa + emprego', desc: 'Daft.ie para moradia, Indeed para emprego.' },
+  { date: '🎄 Dezembro 2026', title: 'Família chega para te visitar!', desc: 'Natal em Dublin, Réveillon em Edimburgo!' },
+  { date: '🏖️ ~Março 2027', title: 'Fim das aulas — Férias!', desc: '2 meses para viajar e trabalhar 40h/sem.' },
+  { date: '🏠 ~Maio 2027', title: 'Retorno ao Brasil', desc: 'Fluente em inglês, com experiência internacional!' },
+];
+let tlDone = {};
+async function buildTL() {
+  const c = document.getElementById('tl-container'); if (!c) return;
+  // Load from cloud
+  const rows = await dbGet('cork_timeline');
+  if (rows && rows.length) {
+    tlDone = {};
+    rows.forEach(r => { tlDone[r.id.replace('tl_','')] = r.done; });
+    try { localStorage.setItem('tl_done', JSON.stringify(tlDone)); } catch(e) {}
+  } else {
+    try { tlDone = JSON.parse(localStorage.getItem('tl_done') || '{}'); } catch(e) {}
+  }
+  c.innerHTML = TL.map((item, i) => {
+    const done = tlDone[i] || item.fixed;
+    return `<div class="tli ${done ? 'done' : ''}">
+      <div class="tl-date">${item.date}</div>
+      <h4>${item.title}</h4>
+      <p>${item.desc}</p>
+      ${!item.fixed ? `<button class="tl-btn ${done ? 'done' : ''}" onclick="markTL(${i})">${done ? '✅ Concluído' : 'Marcar como concluído'}</button>` : ''}
+    </div>`;
+  }).join('');
+}
+async function markTL(i) {
+  tlDone[i] = !tlDone[i];
+  try { localStorage.setItem('tl_done', JSON.stringify(tlDone)); } catch(e) {}
+  await dbUpsert('cork_timeline', { id: 'tl_'+i, done: !!tlDone[i], updated_at: new Date().toISOString() });
+  buildTL();
+  buildHomeNext();
+}
+buildTL();
+
+async function buildHomeNext() {
+  const c = document.getElementById('home-next'); if (!c) return;
+  const rows = await dbGet('cork_timeline');
+  let done = {};
+  if (rows && rows.length) rows.forEach(r => { done[r.id.replace('tl_','')] = r.done; });
+  else { try { done = JSON.parse(localStorage.getItem('tl_done') || '{}'); } catch(e) {} }
+  const items = TL.filter((t, i) => !t.fixed && !done[i]).slice(0, 4);
+  c.innerHTML = items.map(t => `<div class="card cwl"><div class="ci">📌</div><h3>${t.title}</h3><p>${t.desc}</p></div>`).join('') || '<div class="card chl"><div class="ci">🎉</div><h3>Tudo em dia!</h3><p>Checklist completo!</p></div>';
+}
+buildHomeNext();
+
+// ─────────────────────────────────────────────
+// ROTEIRO PESSOAL
+// ─────────────────────────────────────────────
+let roteiroItems = [];
+(async function() {
+  const rows = await dbGet('cork_roteiro');
+  if (rows && rows.length) {
+    roteiroItems = rows.map(r => ({ id: r.id, data: r.data, hora: r.hora, tit: r.titulo, desc: r.descricao }));
+    roteiroItems.sort((a,b) => (a.data+a.hora) > (b.data+b.hora) ? 1 : -1);
+  } else {
+    try { roteiroItems = JSON.parse(localStorage.getItem('roteiro_v2') || '[]'); } catch(e) {}
+  }
+  renderRoteiro();
+})();
+
+async function addRoteiro() {
+  const data = document.getElementById('r-data')?.value;
+  const hora = document.getElementById('r-hora')?.value;
+  const tit = document.getElementById('r-tit')?.value.trim();
+  const desc = document.getElementById('r-desc')?.value.trim();
+  if (!tit) return;
+  const row = { data, hora, titulo: tit, descricao: desc };
+  const saved = await dbInsert('cork_roteiro', row);
+  if (saved) roteiroItems.push({ id: saved.id, data, hora, tit, desc });
+  else roteiroItems.push({ id: Date.now().toString(), data, hora, tit, desc });
+  roteiroItems.sort((a,b) => (a.data+a.hora) > (b.data+b.hora) ? 1 : -1);
+  ['r-tit','r-desc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  renderRoteiro();
+}
+function renderRoteiro() {
+  const c = document.getElementById('roteiro-list'); if (!c) return;
+  if (!roteiroItems.length) { c.innerHTML = '<div class="tip">🗓️ Nenhuma atividade ainda. Adicione o que você vai fazer em Cork!</div>'; return; }
+  c.innerHTML = roteiroItems.map((it, i) => `
+    <div class="ritem user">
+      <div class="ri-time">${it.data ? it.data.split('-').reverse().join('/') : '—'}<br>${it.hora || ''}</div>
+      <div class="ri-body"><div class="ri-title">${it.tit}</div>${it.desc ? `<div class="ri-desc">${it.desc}</div>` : ''}</div>
+      <button class="ri-del" onclick="delRoteiro('${it.id}',${i})">✕</button>
+    </div>`).join('');
+}
+async function delRoteiro(id, i) {
+  await dbDelete('cork_roteiro', { id });
+  roteiroItems.splice(i, 1);
+  renderRoteiro();
+}
+
+// ─────────────────────────────────────────────
+// DESTINOS EUROPA
+// ─────────────────────────────────────────────
+const DESTS = [
+  { flag:'🇮🇪', name:'Cork & Arredores', color:'#1a5c2e', dist:'Local', cost:'🚌 grátis/barato',
+    attrs:[{ico:'🏰',n:'Blarney Castle',d:'Pedra da eloquência! €18. 8km de Cork',a:'Blarney Castle, Cork, Ireland'},{ico:'⛵',n:'Cobh',d:'Cidade histórica na baía. Titanic saiu daqui!',a:'Cobh, Cork, Ireland'},{ico:'🌊',n:'Kinsale',d:'Vilarejo de pescadores. Restaurantes incríveis.',a:'Kinsale, Cork, Ireland'},{ico:'⛰️',n:'Ring of Kerry',d:'Rota panorâmica deslumbrante. Dia inteiro.',a:'Ring of Kerry, Ireland'}]},
+  { flag:'🇮🇪', name:'Dublin', color:'#16213e', dist:'~3h de ônibus', cost:'🚌 ~€14',
+    attrs:[{ico:'🏰',n:'Dublin Castle',d:'€12. Centro histórico.',a:'Dublin Castle, Dublin, Ireland'},{ico:'🍺',n:'Temple Bar',d:'Bairro de pubs ao longo do Liffey. Grátis!',a:'Temple Bar, Dublin, Ireland'},{ico:'📚',n:'Trinity College',d:'Book of Kells: €16.',a:'Trinity College Dublin, Ireland'},{ico:'🍺',n:'Guinness Storehouse',d:'7 andares + vista panorâmica. €26.',a:'Guinness Storehouse, Dublin, Ireland'}]},
+  { flag:'🇵🇹', name:'Lisboa & Porto', color:'#c0392b', dist:'~2h de voo', cost:'✈️ €40–90',
+    attrs:[{ico:'🏰',n:'Castelo São Jorge',d:'Vista incrível de Lisboa. €15.',a:'Castelo de Sao Jorge, Lisbon, Portugal'},{ico:'🚠',n:'Elétrico 28',d:'Passeio histórico pelas ruelas. €3.',a:'Tram 28, Lisbon, Portugal'},{ico:'🌉',n:'Ponte Dom Luís I (Porto)',d:'Vista deslumbrante. Grátis!',a:'Dom Luis Bridge, Porto, Portugal'}]},
+  { flag:'🇪🇸', name:'Barcelona', color:'#c0392b', dist:'~2h30 de voo', cost:'✈️ €50–120',
+    attrs:[{ico:'⛪',n:'Sagrada Família',d:'Obra-prima de Gaudí. €36.',a:'Sagrada Familia, Barcelona, Spain'},{ico:'🌊',n:'Praia de Barceloneta',d:'Grátis! 4km de praia urbana.',a:'Barceloneta Beach, Barcelona'},{ico:'🏡',n:'Park Güell',d:'€10. Vista da cidade.',a:'Park Guell, Barcelona, Spain'}]},
+  { flag:'🇫🇷', name:'Paris', color:'#8e44ad', dist:'~2h de voo', cost:'✈️ €60–140',
+    attrs:[{ico:'🗼',n:'Torre Eiffel',d:'Ícone mundial. €29 (topo).',a:'Eiffel Tower, Paris, France'},{ico:'🎨',n:'Museu do Louvre',d:'€17. Mona Lisa!',a:'Louvre Museum, Paris, France'},{ico:'⛪',n:'Notre-Dame',d:'Grátis por fora! Em restauração.',a:'Notre Dame Cathedral, Paris, France'}]},
+  { flag:'🇳🇱', name:'Amsterdã', color:'#e67e22', dist:'~2h de voo', cost:'✈️ €50–110',
+    attrs:[{ico:'🚲',n:'Passeio de bicicleta',d:'A melhor forma de ver a cidade! Aluguel ~€12/dia.',a:'Amsterdam, Netherlands'},{ico:'🏛️',n:'Rijksmuseum',d:'Arte holandesa clássica. €22.',a:'Rijksmuseum, Amsterdam, Netherlands'}]},
+  { flag:'🇩🇪', name:'Berlim', color:'#c0392b', dist:'~2h30 de voo', cost:'✈️ €40–100',
+    attrs:[{ico:'🏛️',n:'Portão de Brandemburgo',d:'Símbolo da reunificação. Grátis!',a:'Brandenburg Gate, Berlin, Germany'},{ico:'🧱',n:'East Side Gallery',d:'Muro de Berlim com arte urbana. Grátis!',a:'East Side Gallery, Berlin, Germany'}]},
+  { flag:'🇲🇦', name:'Marrocos', color:'#27ae60', dist:'~3h via Lisboa', cost:'✈️ €100–200',
+    attrs:[{ico:'🕌',n:'Medina de Marrakech',d:'Labirinto de emoções. Patrimônio UNESCO.',a:'Marrakech Medina, Morocco'},{ico:'🏜️',n:'Deserto do Saara',d:'Noite sob as estrelas. Experiência única!',a:'Merzouga Desert, Morocco'}]},
+  { flag:'🇮🇸', name:'Islândia', color:'#2980b9', dist:'~3h de voo', cost:'✈️ €80–180',
+    attrs:[{ico:'🌌',n:'Aurora Boreal',d:'Set–Mar. Vista mágica!',a:'Reykjavik, Iceland'},{ico:'♨️',n:'Blue Lagoon',d:'Piscinas geotermais. €50–80.',a:'Blue Lagoon, Iceland'}]},
+];
+function buildDests() {
+  const c = document.getElementById('dest-list'); if (!c) return;
+  c.innerHTML = DESTS.map((d, di) => `
+    <div class="dcard">
+      <div class="dc-hdr" style="background:${d.color}" onclick="toggleDest(${di})">
+        <div class="dc-left">
+          <span class="dc-flag">${d.flag}</span>
+          <div><h3>${d.name}</h3><div class="tg">${d.dist}</div></div>
+        </div>
+        <div class="dc-right">
+          <span class="dpill">${d.cost}</span>
+          <span class="chev" id="chev-${di}">▼</span>
+        </div>
+      </div>
+      <div class="dc-body" id="dbody-${di}">
+        ${d.attrs.map(a => `
+          <div class="attr-item">
+            <span class="attr-ico">${a.ico}</span>
+            <div class="attr-body-inner">
+              <div class="attr-name">${a.n}</div>
+              <div class="attr-desc">${a.d}</div>
+              <div class="attr-row">
+                <button class="ir-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(a.a)}','_blank')">🗺️ IR</button>
+                <button class="ph-btn" onclick="toggleAttrPhoto(this,'${encodeURIComponent(a.n)}')">📸 foto</button>
+              </div>
+              <div class="attr-photo"></div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function toggleDest(di) {
+  const body = document.getElementById('dbody-' + di);
+  const chev = document.getElementById('chev-' + di);
+  const open = body.classList.contains('op');
+  document.querySelectorAll('.dc-body').forEach(b => b.classList.remove('op'));
+  document.querySelectorAll('.chev').forEach(c => c.classList.remove('op'));
+  if (!open) { body.classList.add('op'); chev.classList.add('op'); }
+}
+buildDests();
+
+async function toggleAttrPhoto(btn, nameEnc) {
+  const card = btn.closest('.attr-item');
+  const photoDiv = card.querySelector('.attr-photo');
+  if (!photoDiv) return;
+  if (photoDiv.classList.contains('op')) { photoDiv.classList.remove('op'); btn.textContent = '📸 foto'; return; }
+  photoDiv.classList.add('op'); btn.textContent = '📸 ocultar';
+  if (photoDiv.querySelector('img')) return;
+  const name = decodeURIComponent(nameEnc);
+  photoDiv.innerHTML = '<div class="attr-photo-load">🔍 Carregando foto...</div>';
+  try {
+    const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(name)}&prop=pageimages&format=json&pithumbsize=400&origin=*`);
+    const data = await res.json();
+    const pages = data.query.pages;
+    const page = pages[Object.keys(pages)[0]];
+    if (page && page.thumbnail) { photoDiv.innerHTML = `<img src="${page.thumbnail.source}" alt="${name}" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px">`; return; }
+  } catch(e) {}
+  const q = name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/ /g, '+');
+  photoDiv.innerHTML = `<img src="https://source.unsplash.com/400x200/?${q},travel" alt="${name}" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px" onerror="this.parentElement.innerHTML='<div class=attr-photo-load>Foto indisponível</div>'">`;
+}
+
+// ─────────────────────────────────────────────
+// SISTEMA UNIFICADO DE GUIAS (Cork + Europa)
+// ─────────────────────────────────────────────
+const CORK_PLACES = [
+  { cat:'mercado', ico:'🛒', name:'Lidl — Patrick Street', desc:'O mais barato de Cork. Ótima variedade.', addr:'Lidl Patrick Street Cork Ireland', tip:'⭐ Favorito dos intercambistas', lat:51.8984, lng:-8.4762 },
+  { cat:'mercado', ico:'🛒', name:'Aldi — Douglas', desc:'Aldi na zona sul. Excelente custo-benefício.', addr:'Aldi Douglas Cork Ireland', lat:51.8806, lng:-8.4498 },
+  { cat:'mercado', ico:'🛒', name:'Tesco — Paul Street', desc:'Grande variedade. Tem seção de produtos internacionais.', addr:'Tesco Paul Street Cork Ireland', tip:'Tem Club Card para descontos', lat:51.8995, lng:-8.4740 },
+  { cat:'mercado', ico:'🛒', name:'Dunnes Stores — St Patrick St', desc:'Supermercado e roupas. Muito popular entre locais.', addr:'Dunnes Stores Patrick Street Cork', lat:51.8990, lng:-8.4748 },
+  { cat:'mercado', ico:'🏛️', name:'English Market', desc:'Mercado histórico coberto desde 1788. Frescos locais, queijos, peixe. Imperdível!', addr:'English Market Cork Ireland', tip:'🏛️ Patrimônio histórico — visita obrigatória!', lat:51.8983, lng:-8.4730 },
+  { cat:'mercado', ico:'🛒', name:'Marks & Spencer Food Hall', desc:'Supermercado premium. Bom para produtos especiais.', addr:'Marks Spencer Patrick Street Cork', lat:51.8988, lng:-8.4745 },
+  { cat:'shopping', ico:'🛍️', name:'Penneys (Primark) — Patrick St', desc:'Roupas de inverno super baratas. Essencial para o frio irlandês!', addr:'Penneys Patrick Street Cork', tip:'⭐ Compre agasalhos aqui!', lat:51.8994, lng:-8.4746 },
+  { cat:'shopping', ico:'🛍️', name:'Mahon Point Shopping Centre', desc:'Shopping completo com lojas e cinema. 4km do centro.', addr:'Mahon Point Shopping Centre Cork', lat:51.8808, lng:-8.4282 },
+  { cat:'shopping', ico:'🛍️', name:"Merchant's Quay Shopping", desc:'Shopping no centro. H&M, Boots, Zara.', addr:"Merchant's Quay Shopping Centre Cork", lat:51.8985, lng:-8.4755 },
+  { cat:'shopping', ico:'🛍️', name:'Blackpool Shopping Centre', desc:'Shopping zona norte. Menos turístico, mais local.', addr:'Blackpool Shopping Centre Cork', lat:51.9106, lng:-8.4791 },
+  { cat:'restaurante', ico:'🍽️', name:'Farmgate Café (English Market)', desc:'Restaurante dentro do mercado histórico. Comida local excelente!', addr:'Farmgate Cafe English Market Cork', tip:'⭐ Muito recomendado pelos locais!', lat:51.8983, lng:-8.4730 },
+  { cat:'restaurante', ico:'🍽️', name:'Nash 19', desc:'Café e restaurante. Brunch e almoço muito popular. €12–18.', addr:'Nash 19 Cork Ireland', lat:51.8972, lng:-8.4721 },
+  { cat:'restaurante', ico:'🍽️', name:"Fenn's Quay", desc:'Restaurante às margens do Lee. Comida moderna irlandesa.', addr:"Fenn's Quay Restaurant Cork", lat:51.8990, lng:-8.4810 },
+  { cat:'restaurante', ico:'🍽️', name:'Café Gusto', desc:'Café com almoço. Sandwíches e sopas. Ótimo custo-benefício.', addr:'Cafe Gusto Cork', lat:51.8989, lng:-8.4762 },
+  { cat:'restaurante', ico:'🍽️', name:'Electric — South Mall', desc:'Gastropub com vista do rio. Burger e prato do dia.', addr:'Electric Pub South Mall Cork', lat:51.8980, lng:-8.4715 },
+  { cat:'fastfood', ico:'🍔', name:"McDonald's — Patrick Street", desc:'O mais central. Também tem banheiro!', addr:"McDonald's Patrick Street Cork", lat:51.8992, lng:-8.4752 },
+  { cat:'fastfood', ico:'🍔', name:"Supermac's", desc:"Fast food irlandês! Muito popular e barato. Burguer + batatas €8.", addr:"Supermac's Cork", tip:'🇮🇪 Fast food local irlandês!', lat:51.8996, lng:-8.4740 },
+  { cat:'fastfood', ico:'🌯', name:'Boojum — Winthrop Street', desc:'Burrito mexicano. Super popular entre estudantes. €9–11.', addr:'Boojum Cork', tip:'⭐ Favorito dos estudantes', lat:51.8988, lng:-8.4748 },
+  { cat:'fastfood', ico:'🐟', name:'Jackie Lennox — Fish & Chips', desc:'A melhor fish & chips de Cork. Ícone local desde 1951!', addr:'Jackie Lennox Cork', tip:'🏆 Fish & chips mais famoso de Cork!', lat:51.8873, lng:-8.4883 },
+  { cat:'fastfood', ico:'🥙', name:"KC & Sun's", desc:'Döner kebab e wraps. Barato e gostoso. Frequentado à noite.', addr:"KC Sun's Cork", lat:51.8985, lng:-8.4749 },
+  { cat:'pub', ico:'🍺', name:'The Oval Bar', desc:'Pub histórico em forma oval. Clássico de Cork. Muito fotogênico!', addr:'The Oval Bar Cork', lat:51.8993, lng:-8.4768 },
+  { cat:'pub', ico:'🍺', name:'Sin É — Coburg Street', desc:'Pub tradicional com música ao vivo frequente. Autêntico!', addr:'Sin E Coburg Street Cork', tip:'🎵 Música ao vivo tradicional', lat:51.9001, lng:-8.4663 },
+  { cat:'pub', ico:'🍺', name:"The Abbot's Alehouse", desc:'Pub estudantil. Barato, animado e bem localizado.', addr:"The Abbott's Alehouse Cork", tip:'💰 Preços mais baratos', lat:51.8979, lng:-8.4764 },
+  { cat:'pub', ico:'🍺', name:'An Spailpín Fánach', desc:'Pub gaélico autêntico. Música tradicional irlandesa. Imperdível!', addr:'An Spailpin Fanach Cork', tip:'🎵 Música ao vivo tradicional', lat:51.8968, lng:-8.4752 },
+  { cat:'pub', ico:'🍺', name:'The Mutton Lane Inn', desc:'Pub minúsculo e charmoso em ruela histórica. O mais antigo de Cork!', addr:'The Mutton Lane Inn Cork', lat:51.8985, lng:-8.4742 },
+  { cat:'turistico', ico:'🏰', name:'Blarney Castle', desc:'A Pedra da Eloquência! Quem beija ganha o dom da fala. €18. 8km do centro.', addr:'Blarney Castle Cork Ireland', tip:'🏆 Atração #1 de Cork!', lat:51.9290, lng:-8.5706 },
+  { cat:'turistico', ico:'⛵', name:'Cobh', desc:'Cidade histórica na baía. O Titanic partiu daqui! Trem 25min do centro.', addr:'Cobh Cork Ireland', tip:'🚂 Trem de Cork em 25 min — ~€8', lat:51.8510, lng:-8.2967 },
+  { cat:'turistico', ico:'🌊', name:'Kinsale', desc:'Charmoso vilarejo de pescadores. Restaurantes incríveis. 25km de Cork.', addr:'Kinsale Cork Ireland', tip:'🍽️ Gastronomia de frutos do mar', lat:51.7063, lng:-8.5210 },
+  { cat:'turistico', ico:'🌳', name:'Fitzgerald Park', desc:'Parque bonito às margens do Lee. Museu de Cork. Entrada grátis!', addr:'Fitzgerald Park Cork', lat:51.8973, lng:-8.4980 },
+  { cat:'turistico', ico:'⛪', name:"St. Fin Barre's Cathedral", desc:'Catedral gótica belíssima. €6. Um dos cartões postais de Cork.', addr:"St Fin Barre's Cathedral Cork", lat:51.8940, lng:-8.4815 },
+  { cat:'turistico', ico:'⚖️', name:'Cork City Gaol', desc:'Prisão histórica transformada em museu. €12. Muito interessante!', addr:'Cork City Gaol', tip:'🏛️ Ótimo museu histórico', lat:51.8974, lng:-8.4935 },
+  { cat:'turistico', ico:'🎓', name:'University College Cork (UCC)', desc:'Campus histórico lindo. Jardins e biblioteca. Grátis visitar!', addr:'University College Cork', lat:51.8930, lng:-8.4920 },
+  { cat:'saude', ico:'💊', name:'Boots Pharmacy — Patrick Street', desc:'Farmácia central. Medicamentos e produtos de higiene.', addr:'Boots Pharmacy Patrick Street Cork', lat:51.8989, lng:-8.4743 },
+  { cat:'saude', ico:'🏥', name:'Cork University Hospital (CUH)', desc:'Principal hospital público. Urgência disponível.', addr:'Cork University Hospital', lat:51.8892, lng:-8.5050 },
+  { cat:'saude', ico:'🏥', name:'Mercy University Hospital', desc:'Hospital no centro de Cork. Urgência.', addr:'Mercy University Hospital Cork', lat:51.8980, lng:-8.4811 },
+  { cat:'saude', ico:'🦷', name:'Cork Dental School & Hospital', desc:'Tratamento dental mais barato — serviço de estudantes de odontologia.', addr:'Cork Dental School Hospital', tip:'💰 Consultas mais baratas!', lat:51.8940, lng:-8.4815 },
+  { cat:'transporte', ico:'🚌', name:'Cork Bus Station (Parnell Place)', desc:'Ônibus para Dublin, Galway, Limerick e toda a Irlanda.', addr:'Parnell Place Bus Station Cork', tip:'📱 App Bus Éireann para horários', lat:51.9005, lng:-8.4676 },
+  { cat:'transporte', ico:'🚂', name:'Kent Train Station', desc:'Trem para Dublin (~3h, €30–50), Killarney e Tralee.', addr:'Kent Train Station Cork', tip:'🚂 Book online com antecedência!', lat:51.9031, lng:-8.4612 },
+  { cat:'transporte', ico:'✈️', name:'Cork Airport', desc:'Voos para toda a Europa. Ryanair, Aer Lingus. 6km do centro.', addr:'Cork Airport Ireland', tip:'🚌 Bus 226 do centro — €9', lat:51.8411, lng:-8.4915 },
+];
+
+const EUROPA_PLACES = [
+  // IRLANDA
+  { cat:'turistico', pais:'ie', ico:'🏰', name:'Dublin Castle', desc:'Castelo histórico no coração de Dublin. €12.', addr:'Dublin Castle Dublin Ireland', lat:53.3430, lng:-6.2673 },
+  { cat:'pub', pais:'ie', ico:'🍺', name:'Temple Bar — Dublin', desc:'Bairro de pubs ao longo do Liffey. Atmosfera incrível!', addr:'Temple Bar Dublin Ireland', tip:'🎵 Música ao vivo toda noite', lat:53.3454, lng:-6.2640 },
+  { cat:'turistico', pais:'ie', ico:'📚', name:'Trinity College — Book of Kells', desc:'Manuscrito medieval de 800 d.C. €16.', addr:'Trinity College Dublin Ireland', lat:53.3438, lng:-6.2546 },
+  { cat:'turistico', pais:'ie', ico:'🍺', name:'Guinness Storehouse', desc:'7 andares de história + vista panorâmica. €26.', addr:'Guinness Storehouse Dublin Ireland', tip:'🏆 Atração #1 de Dublin!', lat:53.3418, lng:-6.2866 },
+  { cat:'turistico', pais:'ie', ico:'⛰️', name:'Ring of Kerry', desc:'Rota panorâmica deslumbrante. Dia inteiro. Vale cada km!', addr:'Ring of Kerry Ireland', lat:51.9693, lng:-9.9367 },
+  { cat:'turistico', pais:'ie', ico:'🌊', name:'Cliffs of Moher', desc:'Falésias de 214m. €8. Uma das vistas mais incríveis da Irlanda!', addr:'Cliffs of Moher Ireland', tip:'🌅 Melhor ao pôr do sol!', lat:52.9717, lng:-9.4264 },
+  { cat:'turistico', pais:'ie', ico:'🏰', name:'Rock of Cashel', desc:'Ruínas medievais dramáticas no topo de uma colina. €8.', addr:'Rock of Cashel Tipperary Ireland', lat:52.5207, lng:-7.8899 },
+  // PORTUGAL
+  { cat:'turistico', pais:'pt', ico:'🏰', name:'Castelo São Jorge — Lisboa', desc:'Vista incrível de Lisboa e do Tejo. €15.', addr:'Castelo de Sao Jorge Lisbon Portugal', tip:'🌅 Vista panorâmica de Lisboa!', lat:38.7139, lng:-9.1334 },
+  { cat:'turistico', pais:'pt', ico:'🚠', name:'Elétrico 28 — Lisboa', desc:'Passeio histórico pelas ruelas de Lisboa. €3. Compre bilhete antes!', addr:'Tram 28 Lisbon Portugal', lat:38.7139, lng:-9.1384 },
+  { cat:'turistico', pais:'pt', ico:'🏛️', name:'Mosteiro dos Jerónimos', desc:'Arquitetura manuelina deslumbrante. €10. Patrimônio UNESCO.', addr:'Mosteiro dos Jeronimos Lisbon', lat:38.6979, lng:-9.2068 },
+  { cat:'turistico', pais:'pt', ico:'🌉', name:'Ponte Dom Luís I — Porto', desc:'Vista deslumbrante do Porto e do Douro. Grátis!', addr:'Dom Luis Bridge Porto Portugal', lat:41.1400, lng:-8.6096 },
+  { cat:'restaurante', pais:'pt', ico:'🐟', name:'Time Out Market — Lisboa', desc:'Melhor mercado gastronômico de Portugal. Pastéis de bacalhau!', addr:'Time Out Market Lisbon Portugal', tip:'🏆 Experiência gastronômica incrível!', lat:38.7069, lng:-9.1463 },
+  { cat:'turistico', pais:'pt', ico:'🏘️', name:'Bairro Alto — Lisboa', desc:'Bairro de bares e cultura. Animado à noite.', addr:'Bairro Alto Lisbon Portugal', lat:38.7135, lng:-9.1439 },
+  // ESPANHA
+  { cat:'turistico', pais:'es', ico:'⛪', name:'Sagrada Família — Barcelona', desc:'Obra-prima de Gaudí. €36. Reserve online!', addr:'Sagrada Familia Barcelona Spain', tip:'📅 Reserve com antecedência!', lat:41.4036, lng:2.1744 },
+  { cat:'turistico', pais:'es', ico:'🌊', name:'Praia de Barceloneta', desc:'Grátis! 4km de praia urbana. Metro até lá.', addr:'Barceloneta Beach Barcelona Spain', lat:41.3751, lng:2.1918 },
+  { cat:'turistico', pais:'es', ico:'🏡', name:'Park Güell — Barcelona', desc:'€10. Vista da cidade + arte de Gaudí.', addr:'Park Guell Barcelona Spain', lat:41.4145, lng:2.1527 },
+  { cat:'turistico', pais:'es', ico:'🎨', name:'Museu do Prado — Madrid', desc:'Maior pinacoteca do mundo. €15.', addr:'Prado Museum Madrid Spain', tip:'🎨 Velázquez, Goya, El Bosco!', lat:40.4138, lng:-3.6921 },
+  { cat:'turistico', pais:'es', ico:'🏟️', name:'Estádio Santiago Bernabéu', desc:'Tour pelo estádio do Real Madrid. €25.', addr:'Santiago Bernabeu Madrid Spain', lat:40.4531, lng:-3.6883 },
+  { cat:'restaurante', pais:'es', ico:'🥘', name:'Mercado de La Boqueria — Barcelona', desc:'Mercado icônico em Las Ramblas. Frutas, tapas, mariscos.', addr:'La Boqueria Market Barcelona Spain', tip:'💡 Vá cedo para evitar multidão!', lat:41.3816, lng:2.1719 },
+  // FRANÇA
+  { cat:'turistico', pais:'fr', ico:'🗼', name:'Torre Eiffel — Paris', desc:'Ícone mundial. €29 para o topo. Reserve online!', addr:'Eiffel Tower Paris France', tip:'📅 Reserve com antecedência!', lat:48.8584, lng:2.2945 },
+  { cat:'turistico', pais:'fr', ico:'🎨', name:'Museu do Louvre', desc:'Maior museu do mundo. Mona Lisa! €17.', addr:'Louvre Museum Paris France', lat:48.8606, lng:2.3376 },
+  { cat:'turistico', pais:'fr', ico:'⛪', name:'Notre-Dame de Paris', desc:'Grátis! Em restauração. Vista magnífica.', addr:'Notre Dame Cathedral Paris France', lat:48.8530, lng:2.3499 },
+  { cat:'turistico', pais:'fr', ico:'🏛️', name:'Musée d\'Orsay', desc:'Arte impressionista. Monet, Van Gogh. €16.', addr:"Musee d'Orsay Paris France", tip:'🎨 Van Gogh, Renoir, Monet!', lat:48.8600, lng:2.3266 },
+  { cat:'restaurante', pais:'fr', ico:'🥐', name:'Café de Flore — Paris', desc:'Café histórico em Saint-Germain. Croissants incríveis.', addr:'Cafe de Flore Paris France', lat:48.8542, lng:2.3328 },
+  // ITÁLIA
+  { cat:'turistico', pais:'it', ico:'🏟️', name:'Coliseu — Roma', desc:'Anfiteatro romano do séc. I. €18. Reserve online!', addr:'Colosseum Rome Italy', tip:'📅 Fila enorme — reserve online!', lat:41.8902, lng:12.4922 },
+  { cat:'turistico', pais:'it', ico:'🏛️', name:'Vaticano & Cappella Sistina', desc:'Michelangelo na abóbada. €17. Imperdível!', addr:'Vatican Museums Rome Italy', tip:'🎨 A Criação de Adão de Michelangelo!', lat:41.9029, lng:12.4534 },
+  { cat:'turistico', pais:'it', ico:'⛵', name:'Grand Canal — Veneza', desc:'Passeio de vaporetto pelo canal. €9,50. Grátis a pé!', addr:'Grand Canal Venice Italy', lat:45.4408, lng:12.3155 },
+  { cat:'turistico', pais:'it', ico:'⛪', name:'Duomo di Milano', desc:'Catedral gótica monumental. €15 para o telhado.', addr:'Duomo di Milano Italy', lat:45.4641, lng:9.1919 },
+  { cat:'restaurante', pais:'it', ico:'🍕', name:'Napoli — pizza original', desc:'A cidade que inventou a pizza! Pizzeria Da Michele. €5 a pizza!', addr:'Pizzeria Da Michele Naples Italy', tip:'🏆 A melhor pizza do mundo!', lat:40.8503, lng:14.2678 },
+  // ALEMANHA
+  { cat:'turistico', pais:'de', ico:'🏛️', name:'Portão de Brandemburgo', desc:'Símbolo da reunificação alemã. Grátis!', addr:'Brandenburg Gate Berlin Germany', lat:52.5163, lng:13.3777 },
+  { cat:'turistico', pais:'de', ico:'🧱', name:'East Side Gallery — Berlim', desc:'Muro de Berlim com arte urbana. 1,3km. Grátis!', addr:'East Side Gallery Berlin Germany', tip:'🎨 Maior galeria de arte ao ar livre!', lat:52.5050, lng:13.4399 },
+  { cat:'turistico', pais:'de', ico:'🍺', name:'Oktoberfest — Munique', desc:'Maior festival de cerveja do mundo. Set–Out!', addr:'Theresienwiese Munich Germany', tip:'📅 Reserva hotel com meses de antecedência!', lat:48.1316, lng:11.5497 },
+  { cat:'restaurante', pais:'de', ico:'🥩', name:'Curry 36 — Berlim', desc:'Currywurst clássico de Berlim. €3,50. Comida de rua icônica!', addr:'Curry 36 Mehringdamm Berlin', tip:'🌭 Must-eat em Berlim!', lat:52.4943, lng:13.3878 },
+  // HOLANDA
+  { cat:'turistico', pais:'nl', ico:'🚲', name:'Passeio de bicicleta — Amsterdã', desc:'A melhor forma de ver a cidade! Aluguel ~€12/dia.', addr:'Amsterdam Netherlands', tip:'🚲 A cidade mais ciclável do mundo!', lat:52.3676, lng:4.9041 },
+  { cat:'turistico', pais:'nl', ico:'🏛️', name:'Rijksmuseum — Amsterdã', desc:'Arte holandesa: Rembrandt, Vermeer. €22.', addr:'Rijksmuseum Amsterdam Netherlands', lat:52.3600, lng:4.8852 },
+  { cat:'turistico', pais:'nl', ico:'🌷', name:'Keukenhof — Tulipas', desc:'Parque de tulipas. Aberto Mar–Mai. €20.', addr:'Keukenhof Lisse Netherlands', tip:'🌷 Melhor Março a Maio!', lat:52.2697, lng:4.5468 },
+  // REINO UNIDO
+  { cat:'turistico', pais:'gb', ico:'🕰️', name:'Big Ben & Westminster', desc:'Ícone de Londres. Grátis por fora!', addr:'Big Ben Westminster London UK', lat:51.4994, lng:-0.1245 },
+  { cat:'turistico', pais:'gb', ico:'🌉', name:'Tower Bridge — Londres', desc:'Ponte vitoriana icônica. Torre: €12.', addr:'Tower Bridge London UK', lat:51.5055, lng:-0.0754 },
+  { cat:'turistico', pais:'gb', ico:'🎡', name:'London Eye', desc:'Roda gigante com vista de 135m. €30.', addr:'London Eye London UK', lat:51.5033, lng:-0.1195 },
+  { cat:'turistico', pais:'gb', ico:'🏰', name:'Castelo de Edimburgo', desc:'Castelo medieval dominando a cidade. €18.', addr:'Edinburgh Castle Scotland UK', tip:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Imperdível em Edimburgo!', lat:55.9486, lng:-3.1999 },
+  { cat:'turistico', pais:'gb', ico:'🥃', name:'Scotch Whisky Experience', desc:'Tour e degustação de whisky escocês. €19.', addr:'Scotch Whisky Experience Edinburgh', lat:55.9488, lng:-3.1985 },
+  { cat:'turistico', pais:'gb', ico:'🌄', name:"Arthur's Seat — Edimburgo", desc:"Vulcão extinto com vista 360° de Edimburgo. Grátis!", addr:"Arthur's Seat Edinburgh Scotland", tip:'🥾 1h de caminhada — Vista incrível!', lat:55.9444, lng:-3.1617 },
+  { cat:'pub', pais:'gb', ico:'🥃', name:'Hogmanay — Edimburgo', desc:'Réveillon escocês! A maior festa de Ano Novo do mundo!', addr:'Hogmanay Edinburgh Scotland UK', tip:'🎆 31 Dez — Reserve ingresso!', lat:55.9533, lng:-3.1883 },
+  // POLÔNIA
+  { cat:'turistico', pais:'pl', ico:'🏰', name:'Cidade Velha de Varsóvia', desc:'Rua de tijolo reconstruída após a guerra. Patrimônio UNESCO. Grátis!', addr:'Old Town Warsaw Poland', lat:52.2499, lng:21.0122 },
+  { cat:'turistico', pais:'pl', ico:'🏰', name:'Castelo Real de Varsóvia', desc:'Residência dos reis poloneses. €12.', addr:'Royal Castle Warsaw Poland', lat:52.2477, lng:21.0141 },
+  { cat:'turistico', pais:'pl', ico:'🎵', name:'Museu Chopin — Varsóvia', desc:'Vida e obra do compositor polonês. €14.', addr:'Chopin Museum Warsaw Poland', lat:52.2318, lng:21.0144 },
+  { cat:'restaurante', pais:'pl', ico:'🥟', name:'Pierogi e Barszcz', desc:'Experimente os pierogis (pastéis) e barszcz (sopa de beterraba). Baratos e deliciosos!', addr:'Bar Mleczny Warsaw Poland', tip:'💰 Comida local baratíssima!', lat:52.2297, lng:21.0122 },
+  // ISLÂNDIA
+  { cat:'turistico', pais:'is', ico:'🌌', name:'Aurora Boreal — Reykjavik', desc:'Set–Mar. Vista mágica! Saída do centro.', addr:'Reykjavik Iceland', tip:'🌌 Melhor Set–Mar fora da cidade!', lat:64.1466, lng:-21.9426 },
+  { cat:'turistico', pais:'is', ico:'♨️', name:'Blue Lagoon', desc:'Piscinas geotermais. €50–80. Reserve com antecedência!', addr:'Blue Lagoon Iceland', tip:'📅 Sempre lota — reserve online!', lat:63.8804, lng:-22.4495 },
+  { cat:'turistico', pais:'is', ico:'🏔️', name:'Geysir — Golden Circle', desc:'Gêiser que jorra a cada 4–8 min. Tour de 1 dia. €60.', addr:'Geysir Iceland', lat:64.3108, lng:-20.3021 },
+  // MARROCOS
+  { cat:'turistico', pais:'ma', ico:'🕌', name:'Medina de Marrakech', desc:'Labirinto de emoções e cores. Patrimônio UNESCO.', addr:'Marrakech Medina Morocco', tip:'🛍️ Negocie nos souks!', lat:31.6295, lng:-7.9811 },
+  { cat:'turistico', pais:'ma', ico:'🏜️', name:'Deserto do Saara — Merzouga', desc:'Noite sob as estrelas no deserto. Experiência única!', addr:'Merzouga Desert Morocco', tip:'🌟 Experiência inesquecível!', lat:31.0799, lng:-4.0119 },
+  { cat:'restaurante', pais:'ma', ico:'🍲', name:'Jemaa el-Fna — Marrakech', desc:'Praça central com barracas de comida ao entardecer.', addr:'Jemaa el-Fna Marrakech Morocco', tip:'🌅 Vá ao pôr do sol!', lat:31.6258, lng:-7.9891 },
+];
+
+const PLACE_CATS = {
+  mercado:     { label:'🛒 Mercados & Supermercados', ico:'🛒' },
+  shopping:    { label:'🛍️ Shopping & Lojas', ico:'🛍️' },
+  restaurante: { label:'🍽️ Restaurantes', ico:'🍽️' },
+  fastfood:    { label:'🍔 Fast Food', ico:'🍔' },
+  pub:         { label:'🍺 Pubs & Bares', ico:'🍺' },
+  turistico:   { label:'🏰 Pontos Turísticos', ico:'🏰' },
+  saude:       { label:'💊 Saúde', ico:'💊' },
+  transporte:  { label:'🚌 Transporte', ico:'🚌' },
+  outro:       { label:'📍 Outros', ico:'📍' },
+};
+
+const PAIS_INFO = {
+  ie:{ flag:'🇮🇪', name:'Irlanda' }, pt:{ flag:'🇵🇹', name:'Portugal' },
+  es:{ flag:'🇪🇸', name:'Espanha' }, fr:{ flag:'🇫🇷', name:'França' },
+  it:{ flag:'🇮🇹', name:'Itália'  }, de:{ flag:'🇩🇪', name:'Alemanha' },
+  nl:{ flag:'🇳🇱', name:'Holanda' }, gb:{ flag:'🇬🇧', name:'UK' },
+  pl:{ flag:'🇵🇱', name:'Polônia' }, is:{ flag:'🇮🇸', name:'Islândia' },
+  ma:{ flag:'🇲🇦', name:'Marrocos' },
+};
+
+// State
+let guideFilter = { cork:'all', europa:'all' };
+let guideLat = { cork:null, europa:null };
+let guideLng = { cork:null, europa:null };
+let guideFavs = {}, guideCustom = { cork:[], europa:[] };
+let addPlaceGuide = 'cork';
+
+// Load saved data from Supabase
+(async function(){
+  // favs
+  const favRows = await dbGet('cork_guide_favs');
+  if (favRows && favRows.length) {
+    favRows.forEach(r => { guideFavs[r.id] = r.is_fav; });
+  } else {
+    try { guideFavs = JSON.parse(localStorage.getItem('guide_favs') || '{}'); } catch(e){}
+  }
+  // custom
+  const customRows = await dbGet('cork_guide_custom');
+  if (customRows && customRows.length) {
+    guideCustom.cork = customRows.filter(r => r.guia === 'cork').map(r => ({ id: r.id, name: r.name, desc: r.descricao, cat: r.cat, ico: r.ico, addr: r.addr, lat: r.lat, lng: r.lng }));
+    guideCustom.europa = customRows.filter(r => r.guia === 'europa').map(r => ({ id: r.id, name: r.name, desc: r.descricao, cat: r.cat, ico: r.ico, addr: r.addr, lat: r.lat, lng: r.lng, pais: r.pais }));
+  } else {
+    try { guideCustom.cork = JSON.parse(localStorage.getItem('guide_custom_cork') || '[]'); } catch(e){}
+    try { guideCustom.europa = JSON.parse(localStorage.getItem('guide_custom_europa') || '[]'); } catch(e){}
+  }
+  renderGuide('cork');
+  renderGuide('europa');
+})();
+
+function getFavKey(guia, name){ return guia + '::' + name; }
+
+async function toggleFav(guia, name) {
+  const k = getFavKey(guia, name);
+  guideFavs[k] = !guideFavs[k];
+  try { localStorage.setItem('guide_favs', JSON.stringify(guideFavs)); } catch(e){}
+  await dbUpsert('cork_guide_favs', { id: k, is_fav: !!guideFavs[k], updated_at: new Date().toISOString() });
+  renderGuide(guia);
+}
+
+function filterGuide(guia, cat) {
+  guideFilter[guia] = cat;
+  const tabsId = guia + '-tabs';
+  document.querySelectorAll('#' + tabsId + ' .tab').forEach(t => {
+    t.classList.toggle('on', (t.getAttribute('onclick')||'').includes("'" + cat + "'"));
+  });
+  renderGuide(guia);
+}
+
+function getMyLocation(guia) {
+  const st = document.getElementById(guia + '-loc-status');
+  if (!navigator.geolocation) { if(st) st.textContent = '❌ Não suportado'; return; }
+  if (st) st.textContent = '📡 Obtendo...';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      guideLat[guia] = pos.coords.latitude;
+      guideLng[guia] = pos.coords.longitude;
+      if (st) st.textContent = '✅ Localização obtida!';
+      renderGuide(guia);
+    },
+    () => { if(st) st.textContent = '❌ Permissão negada'; }
+  );
+}
+
+function calcDist(lat1,lng1,lat2,lng2){
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function fmtDist(km){ return km<1 ? Math.round(km*1000)+'m' : km.toFixed(1)+' km'; }
+function fmtWalk(km){ const m=Math.round(km/5*60); return m<60?m+' min a pé':Math.floor(m/60)+'h'+('0'+(m%60)).slice(-2)+'m a pé'; }
+
+function buildPlaceCard(guia, p, isCustom) {
+  const key = getFavKey(guia, p.name);
+  const isFav = !!guideFavs[key];
+  const lat = guideLat[guia], lng = guideLng[guia];
+  let distHtml = '';
+  if (lat !== null && lng !== null && p.lat && p.lng) {
+    const km = calcDist(lat, lng, p.lat, p.lng);
+    distHtml = `<span class="place-dist loaded">📍 ${fmtDist(km)} · ${fmtWalk(km)}</span>`;
+  }
+  const mapsUrl = `https://www.google.com/maps/dir/?api=1${lat?`&origin=${lat},${lng}`:''}` +
+    (p.lat&&p.lng ? `&destination=${p.lat},${p.lng}` : `&destination=${encodeURIComponent(p.addr||p.name)}`) +
+    `&travelmode=walking`;
+  const catLabel = PLACE_CATS[p.cat]?.ico || '📍';
+  const paisLabel = p.pais ? ` · ${PAIS_INFO[p.pais]?.flag||''} ${PAIS_INFO[p.pais]?.name||p.pais}` : '';
+  return `<div class="place-card${isCustom?' custom':''}">
+    <div class="place-ico">${p.ico||catLabel}</div>
+    <div class="place-body">
+      <div class="place-name">${p.name}</div>
+      <div class="place-desc">${p.desc||''}</div>
+      ${p.tip?`<div style="font-size:.69rem;color:var(--g);font-weight:500;margin-bottom:4px">💡 ${p.tip}</div>`:''}
+      <div class="place-meta">
+        <span class="place-tag">${catLabel} ${(p.cat||'outro').charAt(0).toUpperCase()+(p.cat||'outro').slice(1)}${paisLabel}</span>
+        ${distHtml}
+      </div>
+    </div>
+    <div class="place-actions">
+      <button class="fav-btn${isFav?' on':''}" onclick="toggleFav('${guia}','${p.name.replace(/'/g,"\\'")}')">
+        ${isFav?'⭐':'☆'}
+      </button>
+      <button class="place-ir" onclick="window.open('${mapsUrl}','_blank')">🗺️ IR</button>
+      ${isCustom?`<button class="place-del" onclick="delCustomPlace('${guia}','${p.name.replace(/'/g,"\\'")}')">🗑️</button>`:''}
+    </div>
+  </div>`;
+}
+
+function renderGuide(guia) {
+  const container = document.getElementById(guia + '-places-list');
+  if (!container) return;
+  const filter = guideFilter[guia] || 'all';
+  const baseList = guia === 'cork' ? CORK_PLACES : EUROPA_PLACES;
+  const customList = (guideCustom[guia] || []).map(p => ({...p, _custom:true}));
+  const allPlaces = [...baseList, ...customList];
+
+  // Favoritos
+  if (filter === 'fav') {
+    const favs = allPlaces.filter(p => guideFavs[getFavKey(guia, p.name)]);
+    if (!favs.length) {
+      container.innerHTML = `<div class="empty-fav"><div class="ef-ico">⭐</div>Nenhum favorito ainda!<br><small>Toque em ☆ nos lugares que quiser salvar.</small></div>`;
+    } else {
+      container.innerHTML = favs.map(p => buildPlaceCard(guia, p, !!p._custom)).join('');
+    }
+    return;
+  }
+
+  // Meus locais (custom)
+  if (filter === 'meu') {
+    if (!customList.length) {
+      container.innerHTML = `<div class="empty-fav"><div class="ef-ico">📌</div>Nenhum local adicionado ainda!<br><small>Use o botão ➕ para salvar seus lugares.</small></div>`;
+    } else {
+      container.innerHTML = customList.map(p => buildPlaceCard(guia, p, true)).join('');
+    }
+    return;
+  }
+
+  // Filtro por país (Europa)
+  if (guia === 'europa' && filter !== 'all') {
+    const items = allPlaces.filter(p => p.pais === filter || (p._custom && p.pais === filter));
+    const info = PAIS_INFO[filter] || {};
+    container.innerHTML = items.length
+      ? `<div class="place-section-label">${info.flag||''} ${info.name||filter}</div>` + items.map(p => buildPlaceCard(guia, p, !!p._custom)).join('')
+      : `<div class="empty-fav"><div class="ef-ico">${info.flag||'🌍'}</div>Nenhum lugar em ${info.name||filter} ainda.<br><small>Adicione via ➕!</small></div>`;
+    return;
+  }
+
+  // Tudo — agrupar por categoria (cork) ou por país (europa)
+  if (guia === 'cork') {
+    let html = '';
+    Object.entries(PLACE_CATS).forEach(([catKey, sec]) => {
+      const items = allPlaces.filter(p => p.cat === catKey);
+      if (!items.length) return;
+      html += `<div class="place-section-label">${sec.label}</div>`;
+      html += items.map(p => buildPlaceCard(guia, p, !!p._custom)).join('');
+    });
+    container.innerHTML = html || '<div class="empty-fav">Nenhum lugar encontrado.</div>';
+  } else {
+    let html = '';
+    Object.entries(PAIS_INFO).forEach(([pk, pi]) => {
+      const items = allPlaces.filter(p => p.pais === pk);
+      if (!items.length) return;
+      html += `<div class="place-section-label">${pi.flag} ${pi.name}</div>`;
+      html += items.map(p => buildPlaceCard(guia, p, !!p._custom)).join('');
+    });
+    // Custom sem país definido
+    const noPais = customList.filter(p => !p.pais);
+    if (noPais.length) { html += '<div class="place-section-label">📍 Outros</div>' + noPais.map(p => buildPlaceCard(guia, p, true)).join(''); }
+    container.innerHTML = html || '<div class="empty-fav">Nenhum lugar encontrado.</div>';
+  }
+}
+
+async function delCustomPlace(guia, name) {
+  const place = guideCustom[guia].find(p => p.name === name);
+  if (place && place.id) await dbDelete('cork_guide_custom', { id: place.id });
+  guideCustom[guia] = guideCustom[guia].filter(p => p.name !== name);
+  renderGuide(guia);
+}
+
+// ── ADD PLACE MODAL ──
+function openAddPlace(guia) {
+  addPlaceGuide = guia;
+  document.getElementById('ap-guia').value = guia;
+  const paisSel = document.getElementById('ap-pais');
+  if (paisSel) paisSel.style.display = guia === 'europa' ? 'block' : 'none';
+  document.getElementById('add-place-modal').style.display = 'flex';
+}
+function closeAddPlace() {
+  document.getElementById('add-place-modal').style.display = 'none';
+  ['ap-nome','ap-desc','ap-addr','ap-lat','ap-lng'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('ap-loc-msg').textContent = '';
+}
+document.getElementById('ap-guia').addEventListener('change', function() {
+  const paisSel = document.getElementById('ap-pais');
+  if (paisSel) paisSel.style.display = this.value === 'europa' ? 'block' : 'none';
+});
+
+function useMyLocForPlace() {
+  const msg = document.getElementById('ap-loc-msg');
+  if (!navigator.geolocation) { if(msg) msg.textContent = '❌ Geolocalização não suportada'; return; }
+  if (msg) msg.textContent = '📡 Obtendo localização...';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      document.getElementById('ap-lat').value = pos.coords.latitude.toFixed(6);
+      document.getElementById('ap-lng').value = pos.coords.longitude.toFixed(6);
+      if (msg) msg.textContent = '✅ Localização atual capturada! Dê um nome ao lugar acima.';
+      const guia = document.getElementById('ap-guia').value;
+      guideLat[guia] = pos.coords.latitude;
+      guideLng[guia] = pos.coords.longitude;
+    },
+    () => { if(msg) msg.textContent = '❌ Não foi possível obter localização. Verifique as permissões.'; }
+  );
+}
+
+async function saveAddPlace() {
+  const nome = document.getElementById('ap-nome')?.value.trim();
+  if (!nome) { alert('Digite um nome para o lugar!'); return; }
+  const guia = document.getElementById('ap-guia')?.value || addPlaceGuide;
+  const cat = document.getElementById('ap-cat')?.value || 'outro';
+  const desc = document.getElementById('ap-desc')?.value.trim();
+  const addr = document.getElementById('ap-addr')?.value.trim();
+  const lat = parseFloat(document.getElementById('ap-lat')?.value) || null;
+  const lng = parseFloat(document.getElementById('ap-lng')?.value) || null;
+  const pais = guia === 'europa' ? (document.getElementById('ap-pais')?.value || null) : null;
+  const catInfo = PLACE_CATS[cat];
+  const row = { guia, name: nome, descricao: desc||'Meu lugar', addr: addr||nome, cat, ico: catInfo?.ico||'📍', lat, lng, pais };
+  const saved = await dbInsert('cork_guide_custom', row);
+  const place = { id: saved?.id || Date.now().toString(), name: nome, desc: desc||'Meu lugar', addr: addr||nome, cat, ico: catInfo?.ico||'📍', lat, lng };
+  if (pais) place.pais = pais;
+  if (!guideCustom[guia]) guideCustom[guia] = [];
+  guideCustom[guia].push(place);
+  showSyncToast('📍 Lugar salvo na nuvem!', 'ok');
+  closeAddPlace();
+  goTo(guia === 'cork' ? 'cork' : 'europa');
+  filterGuide(guia, 'meu');
+}
+
+// ─────────────────────────────────────────────
+// TRADUTOR + FRASES PRONTAS
+// ─────────────────────────────────────────────
+const PHRASES = {
+  en: {
+    '🆘 Emergências': ['Preciso de ajuda!→I need help!','Chame uma ambulância→Call an ambulance!','Onde fica o hospital?→Where is the hospital?','Fui roubado→I have been robbed','Perdi meu passaporte→I lost my passport','Não me sinto bem→I don\'t feel well','Ligue para a polícia→Call the police!'],
+    '💬 Dia a Dia': ['Quanto custa?→How much does it cost?','Onde fica o banheiro?→Where is the bathroom?','Não entendi→I didn\'t understand that','Pode repetir mais devagar?→Can you speak more slowly?','Falo pouco inglês→I speak a little English','Obrigado!→Thank you!','Com licença→Excuse me, please','De onde você é?→Where are you from?'],
+    '🚌 Transporte': ['Onde é a parada de ônibus?→Where is the bus stop?','Quero ir para...→I would like to go to...','Qual ônibus vai para o centro?→Which bus goes to the city centre?','Quanto é a passagem?→How much is the fare?','Estou perdido→I am lost','A que horas sai?→What time does it depart?'],
+    '🍽️ Restaurante': ['Uma mesa para um, por favor→A table for one, please','O cardápio, por favor→The menu, please','Estou com alergia a...→I am allergic to...','A conta, por favor→The bill, please','Está delicioso!→This is delicious!','Sem glúten→Gluten free, please'],
+    '🏠 Moradia & Trabalho': ['Estou procurando um quarto→I am looking for a room','Qual é o valor do aluguel?→What is the rent?','Inclui as contas?→Are the bills included?','Tenho interesse na vaga→I am interested in the job','Quando posso começar?→When can I start?'],
+  },
+  es: {
+    '🆘 Emergências': ['Preciso de ajuda!→¡Necesito ayuda!','Chame uma ambulância→¡Llame a una ambulancia!','Onde fica o hospital?→¿Dónde está el hospital?','Fui roubado→Me han robado','Não me sinto bem→No me siento bien'],
+    '💬 Dia a Dia': ['Quanto custa?→¿Cuánto cuesta?','Onde fica o banheiro?→¿Dónde está el baño?','Não entendi→No entendí','Obrigado!→¡Gracias!','Com licença→Con permiso'],
+    '🚌 Transporte': ['Onde é a parada?→¿Dónde está la parada?','Quero ir para...→Quiero ir a...','Estou perdido→Estoy perdido'],
+    '🍽️ Restaurante': ['A conta, por favor→La cuenta, por favor','Está delicioso!→¡Está delicioso!'],
+    '🏠 Moradia': ['Estou procurando um quarto→Estoy buscando una habitación'],
+  },
+  fr: {
+    '🆘 Emergências': ["Preciso de ajuda!→J'ai besoin d'aide!",'Chame uma ambulância→Appelez une ambulance!','Não me sinto bem→Je ne me sens pas bien'],
+    '💬 Dia a Dia': ['Quanto custa?→Combien ça coûte?','Onde fica o banheiro?→Où sont les toilettes?','Obrigado!→Merci!','Com licença→Excusez-moi'],
+    '🚌 Transporte': ['Quero ir para...→Je voudrais aller à...','Estou perdido→Je suis perdu'],
+    '🍽️ Restaurante': ['A conta, por favor→L\'addition, s\'il vous plaît','Está delicioso!→C\'est délicieux!'],
+    '🏠 Moradia': ['Estou procurando um quarto→Je cherche une chambre'],
+  },
+  de: {
+    '🆘 Emergências': ['Preciso de ajuda!→Ich brauche Hilfe!','Chame uma ambulância→Rufen Sie einen Krankenwagen!','Não me sinto bem→Ich fühle mich nicht gut'],
+    '💬 Dia a Dia': ['Quanto custa?→Wie viel kostet das?','Onde fica o banheiro?→Wo ist die Toilette?','Obrigado!→Danke!','Com licença→Entschuldigung'],
+    '🚌 Transporte': ['Quero ir para...→Ich möchte nach...','Estou perdido→Ich habe mich verirrt'],
+    '🍽️ Restaurante': ['A conta, por favor→Die Rechnung, bitte','Está delicioso!→Das ist lecker!'],
+    '🏠 Moradia': ['Estou procurando um quarto→Ich suche ein Zimmer'],
+  },
+  it: {
+    '🆘 Emergências': ['Preciso de ajuda!→Ho bisogno di aiuto!','Chame uma ambulância→Chiamate un\'ambulanza!','Não me sinto bem→Non mi sento bene'],
+    '💬 Dia a Dia': ['Quanto custa?→Quanto costa?','Onde fica o banheiro?→Dov\'è il bagno?','Obrigado!→Grazie!','Com licença→Permesso'],
+    '🚌 Transporte': ['Quero ir para...→Vorrei andare a...','Estou perdido→Mi sono perso'],
+    '🍽️ Restaurante': ['A conta, por favor→Il conto, per favore','Está delicioso!→È delizioso!'],
+    '🏠 Moradia': ['Estou procurando um quarto→Sto cercando una stanza'],
+  },
+};
+const LANG_NAMES = { en:'Inglês (🇬🇧)', es:'Espanhol (🇪🇸)', fr:'Francês (🇫🇷)', de:'Alemão (🇩🇪)', it:'Italiano (🇮🇹)' };
+const LANG_CODES = { en:'en-GB', es:'es-ES', fr:'fr-FR', de:'de-DE', it:'it-IT' };
+
+function renderPhrases() {
+  const lang = document.getElementById('lang-sel')?.value || 'en';
+  const lname = document.getElementById('lang-name'); if (lname) lname.textContent = LANG_NAMES[lang];
+  const c = document.getElementById('phrases-box'); if (!c) return;
+  const cats = PHRASES[lang] || PHRASES.en;
+  c.innerHTML = Object.entries(cats).map(([cat, phrases]) => `
+    <div class="pcat">
+      <h4>${cat}</h4>
+      ${phrases.map(p => { const [pt, tr] = p.split('→'); return `
+        <div class="pitem">
+          <span class="ppt">${pt}</span>
+          <span class="ptr-t">${tr}</span>
+          <button class="pspk" onclick="speak('${tr.replace(/'/g,"\\'")}','${lang}')">🔊</button>
+        </div>`; }).join('')}
+    </div>`).join('');
+}
+renderPhrases();
+
+function speak(text, lang) {
+  if (!window.speechSynthesis) { alert('Áudio não suportado neste navegador'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = LANG_CODES[lang] || 'en-GB';
+  window.speechSynthesis.speak(u);
+}
+function speakTrans() { const out = document.getElementById('trans-out')?.textContent; const lang = document.getElementById('lang-sel')?.value || 'en'; if (out && out !== 'A tradução aparecerá aqui') speak(out, lang); }
+function doTranslate() {
+  const lang = document.getElementById('lang-sel')?.value || 'en';
+  const text = document.getElementById('trans-in')?.value || '';
+  const out = document.getElementById('trans-out'); if (!out) return;
+  if (!text) { out.textContent = 'Digite algo para traduzir'; return; }
+  let found = '';
+  const cats = PHRASES[lang] || PHRASES.en;
+  Object.values(cats).forEach(phrases => phrases.forEach(p => { const [pt, tr] = p.split('→'); if (text.toLowerCase().includes(pt.toLowerCase().slice(0, 10))) found = tr; }));
+  out.textContent = found || '(Use Google Translate para traduções personalizadas — translate.google.com)';
+}
+
+console.log('🍀 Thales — Intercâmbio Cork 2026 pronto!');
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
