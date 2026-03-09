@@ -3,8 +3,8 @@
 // Cache-first para assets, network-first para API
 // ─────────────────────────────────────────────
 
-const CACHE_NAME = 'cork-2026-v11';
-const STATIC_CACHE = 'cork-static-v11';
+const CACHE_NAME = 'cork-2026-v12';
+const STATIC_CACHE = 'cork-static-v12';
 
 // Arquivos para cache imediato
 const PRECACHE_URLS = [
