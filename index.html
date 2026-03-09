@@ -61,8 +61,8 @@ body{display:flex;flex-direction:column;overflow:hidden;}
 .pg{display:none;padding:16px 18px 20px;}
 .pg.on{display:block;}
 
-/* ── BOTTOM NAV ── */
-.bnav{display:none;background:var(--g);flex-shrink:0;padding:4px 0 max(4px,env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.09);}
+/* ── TOP NAV ── */
+.bnav{display:none;background:var(--g);flex-shrink:0;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.09);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
 .bnitems{display:flex;justify-content:space-around;}
 .bni{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 5px;cursor:pointer;color:rgba(255,255,255,.48);border:none;background:none;font-family:'DM Sans',sans-serif;min-width:42px;}
 .bni.on{color:var(--goldl);}
@@ -385,6 +385,20 @@ table.t tr:nth-child(even) td{background:var(--gp);}
   <div class="hdr-title">Thales 🍀 Cork 2026<small>SEDA College · Irlanda</small></div>
   <button class="sync-btn" onclick="syncAll()" title="Atualizar cotação"><span id="sync-ico">🔄</span> Sync</button>
   <span class="hdr-flag">🇮🇪</span>
+</div>
+
+<!-- TOP NAV (mobile) -->
+<div class="bnav">
+  <div class="bnitems">
+    <button class="bni on" onclick="goTo('home')"><span class="bi">🏠</span><span class="bl">Início</span></button>
+    <button class="bni" onclick="goTo('timeline')"><span class="bi">📅</span><span class="bl">Agenda</span></button>
+    <button class="bni" onclick="goTo('checklist')"><span class="bi">✅</span><span class="bl">Check</span></button>
+    <button class="bni" onclick="goTo('cork')"><span class="bi">📍</span><span class="bl">Cork</span></button>
+    <button class="bni" onclick="goTo('europa')"><span class="bi">🌍</span><span class="bl">Europa</span></button>
+    <button class="bni" onclick="goTo('dinheiro')"><span class="bi">💶</span><span class="bl">€</span></button>
+    <button class="bni" onclick="goTo('registros')"><span class="bi">📸</span><span class="bl">Fotos</span></button>
+    <button class="bni" onclick="goTo('tradutor')"><span class="bi">🗣️</span><span class="bl">Traduzir</span></button>
+  </div>
 </div>
 
 <!-- LAYOUT -->
@@ -865,18 +879,7 @@ table.t tr:nth-child(even) td{background:var(--gp);}
 </div><!-- /layout -->
 
 <!-- BOTTOM NAV (mobile) -->
-<div class="bnav">
-  <div class="bnitems">
-    <button class="bni on" onclick="goTo('home')"><span class="bi">🏠</span><span class="bl">Início</span></button>
-    <button class="bni" onclick="goTo('timeline')"><span class="bi">📅</span><span class="bl">Agenda</span></button>
-    <button class="bni" onclick="goTo('checklist')"><span class="bi">✅</span><span class="bl">Check</span></button>
-    <button class="bni" onclick="goTo('cork')"><span class="bi">📍</span><span class="bl">Cork</span></button>
-    <button class="bni" onclick="goTo('europa')"><span class="bi">🌍</span><span class="bl">Europa</span></button>
-    <button class="bni" onclick="goTo('dinheiro')"><span class="bi">💶</span><span class="bl">€</span></button>
-    <button class="bni" onclick="goTo('registros')"><span class="bi">📸</span><span class="bl">Fotos</span></button>
-    <button class="bni" onclick="goTo('tradutor')"><span class="bi">🗣️</span><span class="bl">Traduzir</span></button>
-  </div>
-</div>
+
 
 <!-- LIGHTBOX -->
 <div class="lb" id="lb" onclick="closeLB()"><button class="lb-x">✕</button><img id="lb-img" src="" alt=""></div>
